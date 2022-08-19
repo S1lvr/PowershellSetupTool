@@ -890,20 +890,20 @@ $okButton.Text = 'Start'
 # $form.AcceptButton = $okButton
 # replace the existing OK button code with this, so the form doesn't close
 $okbutton.Add_Click({
-		$x = $listBox.SelectedItem.replace(' ', '_')
-		$run = -join ("Get-", $x)
-		$progressbar1 = New-Object System.Windows.Forms.ProgressBar
-		$progressbar1.maximum = 2
-		$progressbar1.step = 1
-		$progressbar1.value = 1
-		$progressbar1.style = "marquee"
-		$progressbar1.MarqueeAnimationSpeed = 20
-		$progressbar1.location = New-Object System.Drawing.Point(250, 210)
-		$progressbar1.size = New-Object System.Drawing.Size(175, 23)
-		$Tab1.controls.Add($progressbar1)
-		$script:isinstallrunning = $true
-		Invoke-Expression $run
-	}) # Prepends the chosen option with "Get-" so it works as a function name
+	$x = $listBox.SelectedItem.replace(' ', '_')
+	$run = -join ("Get-", $x)
+	$progressbar1 = New-Object System.Windows.Forms.ProgressBar
+	$progressbar1.maximum = 2
+	$progressbar1.step = 1
+	$progressbar1.value = 1
+	$progressbar1.style = "marquee"
+	$progressbar1.MarqueeAnimationSpeed = 20
+	$progressbar1.location = New-Object System.Drawing.Point(250, 210)
+	$progressbar1.size = New-Object System.Drawing.Size(175, 23)
+	$Tab1.controls.Add($progressbar1)
+	$script:isinstallrunning = $true
+	Invoke-Expression $run
+}) # Prepends the chosen option with "Get-" so it works as a function name
 $okbutton.Cursor = [System.Windows.Forms.Cursors]::Hand
 $Tab1.Controls.Add($okButton)
 
@@ -1031,11 +1031,11 @@ $defaultsbutton.Size = New-Object System.Drawing.Size(175, 23)
 $defaultsbutton.Text = 'Set Default Apps'
 $tab2.Controls.Add($defaultsbutton)
 $defaultsbutton.Add_Click({
-		Set-DefaultMail
-		Set-DefaultPDF
-		Set-ChromeDefault
-		[System.Windows.MessageBox]::Show('Default Programs set for Outlook, Adobe Reader, and Chrome')
-	})
+	Set-DefaultMail
+	Set-DefaultPDF
+	Set-ChromeDefault
+	[System.Windows.MessageBox]::Show('Default Programs set for Outlook, Adobe Reader, and Chrome')
+})
 
 # Create Make Local Admin Button
 $LocalAdminButton = New-Object System.Windows.Forms.Button
@@ -1044,11 +1044,11 @@ $LocalAdminButton.Size = New-Object System.Drawing.Size(175, 23)
 $LocalAdminButton.Text = 'Make Local Admin'
 $tab2.Controls.Add($LocalAdminButton)
 $LocalAdminButton.Add_Click({
-		$username = -join ($env:USERDOMAIN, "\", $env:USERNAME)
-		Add-LocalGroupMember -Group "Administrators" -Member $username
-		$message = -join("User ", $env:USERNAME, " added as local admin")
-		[System.Windows.MessageBox]::Show($message)
-	})
+	$username = -join ($env:USERDOMAIN, "\", $env:USERNAME)
+	Add-LocalGroupMember -Group "Administrators" -Member $username
+	$message = -join("User ", $env:USERNAME, " added as local admin")
+	[System.Windows.MessageBox]::Show($message)
+})
 
 # Create Change Privacy Settings Button
 $PrivacyButton = New-Object System.Windows.Forms.Button
@@ -1057,9 +1057,9 @@ $PrivacyButton.Size = New-Object System.Drawing.Size(175, 23)
 $PrivacyButton.Text = 'Set Privacy Settings'
 $tab2.Controls.Add($PrivacyButton)
 $PrivacyButton.Add_Click({
-		Set-PrivacySettings
-		[System.Windows.MessageBox]::Show('Privacy Settings have been changed.')
-	})
+	Set-PrivacySettings
+	[System.Windows.MessageBox]::Show('Privacy Settings have been changed.')
+})
 
 #Disable Startups
 $StartupsButton = New-Object System.Windows.Forms.Button
