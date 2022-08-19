@@ -1068,9 +1068,9 @@ $StartupsButton.Size = New-Object System.Drawing.Size(175, 23)
 $StartupsButton.Text = 'Disable Unwanted Startup Items'
 $tab2.Controls.Add($StartupsButton)
 $StartupsButton.Add_Click({
-		Disable-Startups
-        [System.Windows.MessageBox]::Show('Startup items have been changed.')
-	})
+	Disable-Startups
+	[System.Windows.MessageBox]::Show('Startup items have been changed.')
+})
 
 #
 # This whole part just hides the console window
