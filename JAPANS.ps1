@@ -73,6 +73,7 @@ $clientarray = @(
 # - See if change startup items script works.
 # - Maybe we make it install gitcli, so it can upload custom client files, and download new ones. https://github.com/dahlbyk/posh-git
 # - See about removing bloatware. maybe with https://github.com/Sycnex/Windows10Debloater
+# - Have script pull installers that need updating fresh from github
 function Get-Mabel_Wadsworth
 {
     Set-NewPCName
