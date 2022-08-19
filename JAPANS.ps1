@@ -63,17 +63,14 @@ $clientarray = @(
 # Next Add commands to the function, for extra help, Ware Butler's function is
 # Completely Commented.
 #-----------
-#Todo:
-# - Replace Chrome installer with Online Version, as the standalone is not longer needed. / Done
-# - Set up a "run just this command" option so I can do this easier.
-# - Finish Custom UI and functionality / Done
-# - Set up Custom Client Import/Export / Done
-# - Finish Custom Client UI ( Domain Settings )
-# - See about pushing all Clients to Custom System, to allow making a proper progress bar.
-# - See if change startup items script works.
-# - Maybe we make it install gitcli, so it can upload custom client files, and download new ones. https://github.com/dahlbyk/posh-git
-# - See about removing bloatware. maybe with https://github.com/Sycnex/Windows10Debloater
-# - Have script pull installers that need updating fresh from github
+#Todo: Set up a "run just this command" option so I can do this easier.
+#Todo: Finish Custom Client UI ( Domain Settings )
+#Todo: See about pushing all Clients to Custom System, to allow making a proper progress bar.
+#Todo: See if change startup items script works.
+#Todo: Maybe we make it install gitcli, so it can upload custom client files, and download new ones. https://github.com/dahlbyk/posh-git
+#	 * On top of this, Git does have a portable version.
+#Todo: See about removing bloatware. maybe with https://github.com/Sycnex/Windows10Debloater
+#Todo: Have script pull installers that need updating fresh from github
 function Get-Mabel_Wadsworth
 {
     Set-NewPCName
@@ -558,7 +555,7 @@ function Disable-Startups #I took this entire function from StackOverflow with 0
         Where-Object {$_.ValueCount -ne 0} | 
         Select-Object  @{Name = 'Location';Expression = {$_.name -replace 'HKEY_LOCAL_MACHINE','HKLM' -replace 'HKEY_CURRENT_USER','HKCU'}},
         @{Name = 'Name';Expression = {$_.Property}} | 
-        %{
+        ForEach-Object{
             ForEach($disableListName in $disableList)
             {
                 If($_.Name -contains $disableListName)
@@ -604,6 +601,171 @@ function Set-DNSAndDomain
 		Set-DnsClientServerAddress -InterfaceIndex $($element).InterfaceIndex -ResetServerAddresses
 	}
 }
+#██████╗░██╗░░░░░░█████╗░░█████╗░████████╗░██╗░░░░░░░██╗░█████╗░██████╗░███████╗
+#██╔══██╗██║░░░░░██╔══██╗██╔══██╗╚══██╔══╝░██║░░██╗░░██║██╔══██╗██╔══██╗██╔════╝
+#██████╦╝██║░░░░░██║░░██║███████║░░░██║░░░░╚██╗████╗██╔╝███████║██████╔╝█████╗░░
+#██╔══██╗██║░░░░░██║░░██║██╔══██║░░░██║░░░░░████╔═████║░██╔══██║██╔══██╗██╔══╝░░
+#██████╦╝███████╗╚█████╔╝██║░░██║░░░██║░░░░░╚██╔╝░╚██╔╝░██║░░██║██║░░██║███████╗
+#╚═════╝░╚══════╝░╚════╝░╚═╝░░╚═╝░░░╚═╝░░░░░░╚═╝░░░╚═╝░░╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝
+
+Set-InstallStartupDirectory
+Import-Module -DisableNameChecking .\"remove-uwp-appx.psm1"
+Import-Module -DisableNameChecking .\"title-templates.psm1"
+Set-Location ..\
+
+function Remove-BloatwareAppsList() { # yoink'd outta https://github.com/LeDragoX/Win-Debloat-Tools
+    $Apps = @(
+        # Default Windows 10+ apps
+        #"Microsoft.3DBuilder"                    # 3D Builder
+        "Microsoft.549981C3F5F10"                # Cortana
+        #"Microsoft.Appconnector"
+        #"Microsoft.BingFinance"                  # Finance
+        #"Microsoft.BingFoodAndDrink"             # Food And Drink
+        #"Microsoft.BingHealthAndFitness"         # Health And Fitness
+        #"Microsoft.BingNews"                     # News
+        #"Microsoft.BingSports"                   # Sports
+        #"Microsoft.BingTranslator"               # Translator
+        #"Microsoft.BingTravel"                   # Travel
+        #"Microsoft.BingWeather"                  # Weather
+        #"Microsoft.CommsPhone"
+        "Microsoft.ConnectivityStore"
+        #"Microsoft.GetHelp"
+        #"Microsoft.Getstarted"
+        #"Microsoft.Messaging"
+        #"Microsoft.Microsoft3DViewer"
+        "Microsoft.MicrosoftOfficeHub"
+        "Microsoft.MicrosoftPowerBIForWindows"
+        #"Microsoft.MicrosoftSolitaireCollection" # MS Solitaire
+        "Microsoft.MixedReality.Portal"
+        "Microsoft.NetworkSpeedTest"
+        "Microsoft.Office.OneNote"               # MS Office One Note
+        "Microsoft.Office.Sway"
+        "Microsoft.OneConnect"
+        "Microsoft.People"                       # People
+        #"Microsoft.MSPaint"                      # Paint 3D
+        #"Microsoft.Print3D"                      # Print 3D
+        "Microsoft.SkypeApp"                     # Skype (Who still uses Skype? Use Discord)
+        "Microsoft.Todos"                        # Microsoft To Do
+        #"Microsoft.Wallet"
+        #"Microsoft.Whiteboard"                   # Microsoft Whiteboard
+        #"Microsoft.WindowsAlarms"                # Alarms
+        #"microsoft.windowscommunicationsapps"
+        #"Microsoft.WindowsMaps"                  # Maps
+        #"Microsoft.WindowsPhone"
+        #"Microsoft.WindowsReadingList"
+        #"Microsoft.WindowsSoundRecorder"         # Windows Sound Recorder
+        "Microsoft.XboxApp"                      # Xbox Console Companion (Replaced by new App)
+        #"Microsoft.YourPhone"                    # Your Phone
+        "Microsoft.ZuneMusic"                    # Groove Music / (New) Windows Media Player
+        "Microsoft.ZuneVideo"                    # Movies & TV
+
+        # Default Windows 11 apps
+        #"MicrosoftWindows.Client.WebExperience"  # Taskbar Widgets
+        #"MicrosoftTeams"                         # Microsoft Teams / Preview
+
+        # 3rd party Apps
+        "*ACGMediaPlayer*"
+        "*ActiproSoftwareLLC*"
+        "*AdobePhotoshopExpress*"                # Adobe Photoshop Express
+        "*Amazon.com.Amazon*"                    # Amazon Shop
+        "*Asphalt8Airborne*"                     # Asphalt 8 Airbone
+        "*AutodeskSketchBook*"
+        "*BubbleWitch3Saga*"                     # Bubble Witch 3 Saga
+        "*CaesarsSlotsFreeCasino*"
+        "*CandyCrush*"                           # Candy Crush
+        "*COOKINGFEVER*"
+        "*CyberLinkMediaSuiteEssentials*"
+        "*DisneyMagicKingdoms*"
+        "*Dolby*"                                # Dolby Products (Like Atmos)
+        "*DrawboardPDF*"
+        "*Duolingo-LearnLanguagesforFree*"       # Duolingo
+        "*EclipseManager*"
+        "*Facebook*"                             # Facebook
+        "*FarmVille2CountryEscape*"
+        "*FitbitCoach*"
+        "*Flipboard*"                            # Flipboard
+        "*HiddenCity*"
+        "*Hulu*"
+        "*iHeartRadio*"
+        "*Keeper*"
+        "*LinkedInforWindows*"
+        "*MarchofEmpires*"
+        "*NYTCrossword*"
+        "*OneCalendar*"
+        "*PandoraMediaInc*"
+        "*PhototasticCollage*"
+        "*PicsArt-PhotoStudio*"
+        "*Plex*"                                 # Plex
+        "*PolarrPhotoEditorAcademicEdition*"
+        "*RoyalRevolt*"                          # Royal Revolt
+        "*Shazam*"
+        "*Sidia.LiveWallpaper*"                  # Live Wallpaper
+        "*SlingTV*"
+        "*Speed Test*"
+        "*Sway*"
+        "*TuneInRadio*"
+        "*Twitter*"                              # Twitter
+        "*Viber*"
+        "*WinZipUniversal*"
+        "*Wunderlist*"
+        "*XING*"
+
+        # Apps which other apps depend on
+        #"Microsoft.Advertising.Xaml"
+
+        # SAMSUNG Bloat
+        #"SAMSUNGELECTRONICSCO.LTD.SamsungSettings1.2"          # Allow user to Tweak some hardware settings
+        "SAMSUNGELECTRONICSCO.LTD.1412377A9806A"
+        "SAMSUNGELECTRONICSCO.LTD.NewVoiceNote"
+        "SAMSUNGELECTRONICSCoLtd.SamsungNotes"
+        "SAMSUNGELECTRONICSCoLtd.SamsungFlux"
+        "SAMSUNGELECTRONICSCO.LTD.StudioPlus"
+        "SAMSUNGELECTRONICSCO.LTD.SamsungWelcome"
+        "SAMSUNGELECTRONICSCO.LTD.SamsungUpdate"
+        "SAMSUNGELECTRONICSCO.LTD.SamsungSecurity1.2"
+        "SAMSUNGELECTRONICSCO.LTD.SamsungScreenRecording"
+        #"SAMSUNGELECTRONICSCO.LTD.SamsungRecovery"             # Used to Factory Reset
+        "SAMSUNGELECTRONICSCO.LTD.SamsungQuickSearch"
+        "SAMSUNGELECTRONICSCO.LTD.SamsungPCCleaner"
+        "SAMSUNGELECTRONICSCO.LTD.SamsungCloudBluetoothSync"
+        "SAMSUNGELECTRONICSCO.LTD.PCGallery"
+        "SAMSUNGELECTRONICSCO.LTD.OnlineSupportSService"
+        "4AE8B7C2.BOOKING.COMPARTNERAPPSAMSUNGEDITION"
+
+        # <==========[ DIY ]==========> (Remove the # to Uninstall)
+
+        # [DIY] Default apps i'll keep
+
+        #"Microsoft.FreshPaint"             # Paint
+        #"Microsoft.MicrosoftEdge"          # Microsoft Edge
+        #"Microsoft.MicrosoftStickyNotes"   # Sticky Notes
+        #"Microsoft.WindowsCalculator"      # Calculator
+        #"Microsoft.WindowsCamera"          # Camera
+        #"Microsoft.ScreenSketch"           # Snip and Sketch (now called Snipping tool, replaces the Win32 version in clean installs)
+        #"Microsoft.WindowsFeedbackHub"     # Feedback Hub
+        #"Microsoft.Windows.Photos"         # Photos
+
+        # [DIY] Common Streaming services
+
+        "*Netflix*"                        # Netflix
+        "*SpotifyMusic*"                   # Spotify
+
+        # [DIY] Can't be reinstalled
+
+        #"Microsoft.WindowsStore"           # Windows Store
+
+        # Apps which cannot be removed using Remove-AppxPackage
+        #"Microsoft.BioEnrollment"
+        #"Microsoft.WindowsFeedback"        # Feedback Module
+        #"Windows.ContactSupport"
+    )
+
+    # Write-Title -Text "Remove Bloatware Apps"
+    # Write-Section -Text "Removing Windows unneeded Apps"
+    Remove-UWPAppx -AppxPackages $Apps
+}
+
+
 #██████╗░██████╗░██╗██╗░░░██╗░█████╗░░█████╗░██╗░░░██╗░░░
 #██╔══██╗██╔══██╗██║██║░░░██║██╔══██╗██╔══██╗╚██╗░██╔╝░░░
 #██████╔╝██████╔╝██║╚██╗░██╔╝███████║██║░░╚═╝░╚████╔╝░░░░
@@ -744,13 +906,32 @@ function Get-PowerSettingChanges
 #██║░╚███║███████╗░░░██║░░░  ███████╗██╔╝╚██╗░░░██║░░░███████╗██║░╚███║██████╔╝███████╗██║░░██║
 #╚═╝░░╚══╝╚══════╝░░░╚═╝░░░  ╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝
 #Update Info:
-#Replace NetEx.msi with newer version.
+#This will pull a NetExtender .msi from the script's github page.
 function Install-NetEx
 {
-	Set-InstallStartupDirectory
-	Add-OutputBoxLine "Installing NetExtender..."
+	Add-OutputBoxLine "Checking if Temp Folder exists in C:\Temp"
+	$Folder = "C:\Temp"
+	if (Test-Path -Path $Folder)
+	{
+		Add-OutputBoxLine "Folder exists, continuing"
+		Set-Location "C:\Temp"
+	}
+	else
+	{
+		Add-OutputBoxLine "Folder does not exist, making C:\Temp exist"
+		New-Item "C:\Temp" -Type Directory
+		Set-Location "C:\Temp"
+		Add-OutputBoxLine "C:\Temp exists, continuing"
+	} #make a folder to work out of, if it doesn't exist
+	Add-OutputBoxLine "Downloading Net Extender Installer..."
+	$webrequest = "https://github.com/S1lvr/PowershellSetupTool/raw/main/InstallData/NetEx.MSI"
+	#--------------------------------------
+	# This link uses my login, so if I ever leave someone needs to change this to someone else's login.
+	#--------------------------------------
+	Invoke-WebRequest -Uri $webrequest -Outfile C:\Temp\NetEx.msi
+	Add-OutputBoxLine "Net Extender downloaded, now installing"
 	Start-Process msiexec -Wait -ArgumentList "/package NetEx.msi /qn /norestart"
-	Add-OutputBoxLine "NetExtender Installed."
+	Add-OutputBoxLine "Net Extender Installed."
 }
 #░█████╗░██╗░░██╗██████╗░░█████╗░███╗░░░███╗███████╗
 #██╔══██╗██║░░██║██╔══██╗██╔══██╗████╗░████║██╔════╝
@@ -874,20 +1055,20 @@ $okButton.Text = 'Start'
 # $form.AcceptButton = $okButton
 # replace the existing OK button code with this, so the form doesn't close
 $okbutton.Add_Click({
-		$x = $listBox.SelectedItem.replace(' ', '_')
-		$run = -join ("Get-", $x)
-		$progressbar1 = New-Object System.Windows.Forms.ProgressBar
-		$progressbar1.maximum = 2
-		$progressbar1.step = 1
-		$progressbar1.value = 1
-		$progressbar1.style = "marquee"
-		$progressbar1.MarqueeAnimationSpeed = 20
-		$progressbar1.location = New-Object System.Drawing.Point(250, 210)
-		$progressbar1.size = New-Object System.Drawing.Size(175, 23)
-		$Tab1.controls.Add($progressbar1)
-		$script:isinstallrunning = $true
-		Invoke-Expression $run
-	}) # Prepends the chosen option with "Get-" so it works as a function name
+	$x = $listBox.SelectedItem.replace(' ', '_')
+	$run = -join ("Get-", $x)
+	$progressbar1 = New-Object System.Windows.Forms.ProgressBar
+	$progressbar1.maximum = 2
+	$progressbar1.step = 1
+	$progressbar1.value = 1
+	$progressbar1.style = "marquee"
+	$progressbar1.MarqueeAnimationSpeed = 20
+	$progressbar1.location = New-Object System.Drawing.Point(250, 210)
+	$progressbar1.size = New-Object System.Drawing.Size(175, 23)
+	$Tab1.controls.Add($progressbar1)
+	$script:isinstallrunning = $true
+	Invoke-Expression $run
+}) # Prepends the chosen option with "Get-" so it works as a function name
 $okbutton.Cursor = [System.Windows.Forms.Cursors]::Hand
 $Tab1.Controls.Add($okButton)
 
@@ -1015,11 +1196,11 @@ $defaultsbutton.Size = New-Object System.Drawing.Size(175, 23)
 $defaultsbutton.Text = 'Set Default Apps'
 $tab2.Controls.Add($defaultsbutton)
 $defaultsbutton.Add_Click({
-		Set-DefaultMail
-		Set-DefaultPDF
-		Set-ChromeDefault
-		[System.Windows.MessageBox]::Show('Default Programs set for Outlook, Adobe Reader, and Chrome')
-	})
+	Set-DefaultMail
+	Set-DefaultPDF
+	Set-ChromeDefault
+	[System.Windows.MessageBox]::Show('Default Programs set for Outlook, Adobe Reader, and Chrome')
+})
 
 # Create Make Local Admin Button
 $LocalAdminButton = New-Object System.Windows.Forms.Button
@@ -1028,11 +1209,11 @@ $LocalAdminButton.Size = New-Object System.Drawing.Size(175, 23)
 $LocalAdminButton.Text = 'Make Local Admin'
 $tab2.Controls.Add($LocalAdminButton)
 $LocalAdminButton.Add_Click({
-		$username = -join ($env:USERDOMAIN, "\", $env:USERNAME)
-		Add-LocalGroupMember -Group "Administrators" -Member $username
-		$message = -join("User ", $env:USERNAME, " added as local admin")
-		[System.Windows.MessageBox]::Show($message)
-	})
+	$username = -join ($env:USERDOMAIN, "\", $env:USERNAME)
+	Add-LocalGroupMember -Group "Administrators" -Member $username
+	$message = -join("User ", $env:USERNAME, " added as local admin")
+	[System.Windows.MessageBox]::Show($message)
+})
 
 # Create Change Privacy Settings Button
 $PrivacyButton = New-Object System.Windows.Forms.Button
@@ -1041,9 +1222,9 @@ $PrivacyButton.Size = New-Object System.Drawing.Size(175, 23)
 $PrivacyButton.Text = 'Set Privacy Settings'
 $tab2.Controls.Add($PrivacyButton)
 $PrivacyButton.Add_Click({
-		Set-PrivacySettings
-		[System.Windows.MessageBox]::Show('Privacy Settings have been changed.')
-	})
+	Set-PrivacySettings
+	[System.Windows.MessageBox]::Show('Privacy Settings have been changed.')
+})
 
 #Disable Startups
 $StartupsButton = New-Object System.Windows.Forms.Button
@@ -1052,9 +1233,20 @@ $StartupsButton.Size = New-Object System.Drawing.Size(175, 23)
 $StartupsButton.Text = 'Disable Unwanted Startup Items'
 $tab2.Controls.Add($StartupsButton)
 $StartupsButton.Add_Click({
-		Disable-Startups
-        [System.Windows.MessageBox]::Show('Startup items have been changed.')
-	})
+	Disable-Startups
+	[System.Windows.MessageBox]::Show('Startup items have been changed.')
+})
+
+#Remove Bloatware
+$BloatwareButton = New-Object System.Windows.Forms.Button
+$BloatwareButton.Location = New-Object System.Drawing.Point(20, 150)
+$BloatwareButton.Size = New-Object System.Drawing.Size(175, 23)
+$BloatwareButton.Text = 'Remove Bloatware'
+$tab2.Controls.Add($BloatwareButton)
+$BloatwareButton.Add_Click({
+	Remove-BloatwareAppsList
+	[System.Windows.MessageBox]::Show('Bloatware From List Removed.')
+})
 
 #
 # This whole part just hides the console window
