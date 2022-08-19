@@ -6,7 +6,7 @@
 #░░╚██╔╝░░██║██████╦╝███████╗  ╚█████╔╝██║░░██║███████╗╚█████╔╝██║░╚██╗
 #░░░╚═╝░░░╚═╝╚═════╝░╚══════╝  ░╚════╝░╚═╝░░╚═╝╚══════╝░╚════╝░╚═╝░░╚═╝
 # ----------------------------------------------
-# This makes sure your vibes (admin rights) are on point.
+# This makes sure your Vibes (admin rights) are on point.
 param ([switch]$Elevated)
 
 function Test-Admin
