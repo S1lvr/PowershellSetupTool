@@ -63,17 +63,14 @@ $clientarray = @(
 # Next Add commands to the function, for extra help, Ware Butler's function is
 # Completely Commented.
 #-----------
-#Todo:
-# - Replace Chrome installer with Online Version, as the standalone is not longer needed. / Done
-# - Set up a "run just this command" option so I can do this easier.
-# - Finish Custom UI and functionality / Done
-# - Set up Custom Client Import/Export / Done
-# - Finish Custom Client UI ( Domain Settings )
-# - See about pushing all Clients to Custom System, to allow making a proper progress bar.
-# - See if change startup items script works.
-# - Maybe we make it install gitcli, so it can upload custom client files, and download new ones. https://github.com/dahlbyk/posh-git
-# - See about removing bloatware. maybe with https://github.com/Sycnex/Windows10Debloater
-# - Have script pull installers that need updating fresh from github
+#Todo: Set up a "run just this command" option so I can do this easier.
+#Todo: Finish Custom Client UI ( Domain Settings )
+#Todo: See about pushing all Clients to Custom System, to allow making a proper progress bar.
+#Todo: See if change startup items script works.
+#Todo: Maybe we make it install gitcli, so it can upload custom client files, and download new ones. https://github.com/dahlbyk/posh-git
+#	 * On top of this, Git does have a portable version.
+#Todo: See about removing bloatware. maybe with https://github.com/Sycnex/Windows10Debloater
+#Todo: Have script pull installers that need updating fresh from github
 function Get-Mabel_Wadsworth
 {
     Set-NewPCName
@@ -558,7 +555,7 @@ function Disable-Startups #I took this entire function from StackOverflow with 0
         Where-Object {$_.ValueCount -ne 0} | 
         Select-Object  @{Name = 'Location';Expression = {$_.name -replace 'HKEY_LOCAL_MACHINE','HKLM' -replace 'HKEY_CURRENT_USER','HKCU'}},
         @{Name = 'Name';Expression = {$_.Property}} | 
-        %{
+        ForEach-Object{
             ForEach($disableListName in $disableList)
             {
                 If($_.Name -contains $disableListName)
@@ -744,13 +741,32 @@ function Get-PowerSettingChanges
 #██║░╚███║███████╗░░░██║░░░  ███████╗██╔╝╚██╗░░░██║░░░███████╗██║░╚███║██████╔╝███████╗██║░░██║
 #╚═╝░░╚══╝╚══════╝░░░╚═╝░░░  ╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚══╝╚═════╝░╚══════╝╚═╝░░╚═╝
 #Update Info:
-#Replace NetEx.msi with newer version.
+#This will pull a NetExtender .msi from the script's github page.
 function Install-NetEx
 {
-	Set-InstallStartupDirectory
-	Add-OutputBoxLine "Installing NetExtender..."
+	Add-OutputBoxLine "Checking if Temp Folder exists in C:\Temp"
+	$Folder = "C:\Temp"
+	if (Test-Path -Path $Folder)
+	{
+		Add-OutputBoxLine "Folder exists, continuing"
+		Set-Location "C:\Temp"
+	}
+	else
+	{
+		Add-OutputBoxLine "Folder does not exist, making C:\Temp exist"
+		New-Item "C:\Temp" -Type Directory
+		Set-Location "C:\Temp"
+		Add-OutputBoxLine "C:\Temp exists, continuing"
+	} #make a folder to work out of, if it doesn't exist
+	Add-OutputBoxLine "Downloading Net Extender Installer..."
+	$webrequest = "https://github.com/S1lvr/PowershellSetupTool/raw/main/InstallData/NetEx.MSI"
+	#--------------------------------------
+	# This link uses my login, so if I ever leave someone needs to change this to someone else's login.
+	#--------------------------------------
+	Invoke-WebRequest -Uri $webrequest -Outfile C:\Temp\NetEx.msi
+	Add-OutputBoxLine "Net Extender downloaded, now installing"
 	Start-Process msiexec -Wait -ArgumentList "/package NetEx.msi /qn /norestart"
-	Add-OutputBoxLine "NetExtender Installed."
+	Add-OutputBoxLine "Net Extender Installed."
 }
 #░█████╗░██╗░░██╗██████╗░░█████╗░███╗░░░███╗███████╗
 #██╔══██╗██║░░██║██╔══██╗██╔══██╗████╗░████║██╔════╝
