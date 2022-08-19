@@ -54,6 +54,7 @@ $clientarray = @(
 	"Ware Butler"
 	"Century 21 SRE"
 	"Rockland Realty"
+    "Mabel Wadsworth"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -63,10 +64,30 @@ $clientarray = @(
 # Completely Commented.
 #-----------
 #Todo:
-# - Replace Chrome installer with Online Version, as the standalone is not longer needed.
+# - Replace Chrome installer with Online Version, as the standalone is not longer needed. / Done
 # - Set up a "run just this command" option so I can do this easier.
-# - Finish Custom UI and functionality
-# - Set up Custom Client Import/Export
+# - Finish Custom UI and functionality / Done
+# - Set up Custom Client Import/Export / Done
+# - Finish Custom Client UI ( Domain Settings )
+# - See about pushing all Clients to Custom System, to allow making a proper progress bar.
+# - See if change startup items script works.
+# - Maybe we make it install gitcli, so it can upload custom client files, and download new ones. https://github.com/dahlbyk/posh-git
+# - See about removing bloatware. maybe with https://github.com/Sycnex/Windows10Debloater
+function Get-Mabel_Wadsworth
+{
+    Set-NewPCName
+    Install-Atera 56
+    Install-Webroot 0AF7-ATRA-16A5-FE4D-46F0
+    Install-GChrome
+    Set-ChromeDefault
+    Install-Reader
+    Install-OfficeInstaller
+    Get-PowerSettingChanges
+    Set-TSMPassword -password "MWworkstation!"
+    Set-DNSAndDomain -DNSServer "192.168.1.9" -DomainServer "mwadsworth.local"
+	Add-OutputBoxLine -Message "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Rockland_Realty
 {
 	Set-NewPCName
@@ -989,7 +1010,7 @@ $tab2.Controls.Add($label2)
 # Create Defaults Button
 $defaultsbutton = New-Object System.Windows.Forms.Button
 $defaultsbutton.Location = New-Object System.Drawing.Point(20, 50)
-$defaultsbutton.Size = New-Object System.Drawing.Size(125, 23)
+$defaultsbutton.Size = New-Object System.Drawing.Size(175, 23)
 $defaultsbutton.Text = 'Set Default Apps'
 $tab2.Controls.Add($defaultsbutton)
 $defaultsbutton.Add_Click({
@@ -1002,7 +1023,7 @@ $defaultsbutton.Add_Click({
 # Create Make Local Admin Button
 $LocalAdminButton = New-Object System.Windows.Forms.Button
 $LocalAdminButton.Location = New-Object System.Drawing.Point(20, 75)
-$LocalAdminButton.Size = New-Object System.Drawing.Size(125, 23)
+$LocalAdminButton.Size = New-Object System.Drawing.Size(175, 23)
 $LocalAdminButton.Text = 'Make Local Admin'
 $tab2.Controls.Add($LocalAdminButton)
 $LocalAdminButton.Add_Click({
@@ -1015,13 +1036,66 @@ $LocalAdminButton.Add_Click({
 # Create Change Privacy Settings Button
 $PrivacyButton = New-Object System.Windows.Forms.Button
 $PrivacyButton.Location = New-Object System.Drawing.Point(20, 100)
-$PrivacyButton.Size = New-Object System.Drawing.Size(125, 23)
+$PrivacyButton.Size = New-Object System.Drawing.Size(175, 23)
 $PrivacyButton.Text = 'Set Privacy Settings'
 $tab2.Controls.Add($PrivacyButton)
 $PrivacyButton.Add_Click({
 		Set-PrivacySettings
 		[System.Windows.MessageBox]::Show('Privacy Settings have been changed.')
 	})
+
+#Disable Startups
+$StartupsButton = New-Object System.Windows.Forms.Button
+$StartupsButton.Location = New-Object System.Drawing.Point(20, 125)
+$StartupsButton.Size = New-Object System.Drawing.Size(175, 23)
+$StartupsButton.Text = 'Disable Unwanted Startup Items'
+$tab2.Controls.Add($StartupsButton)
+$StartupsButton.Add_Click({
+		Disable-Startups
+        [System.Windows.MessageBox]::Show('Startup items have been changed.')
+	})
+
+#
+# This whole part just hides the console window
+#
+# .Net methods for hiding/showing the console in the background
+Add-Type -Name Window -Namespace Console -MemberDefinition '
+[DllImport("Kernel32.dll")]
+public static extern IntPtr GetConsoleWindow();
+
+[DllImport("user32.dll")]
+public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
+'
+
+function Show-Console
+{
+    $consolePtr = [Console.Window]::GetConsoleWindow()
+
+    # Hide = 0,
+    # ShowNormal = 1,
+    # ShowMinimized = 2,
+    # ShowMaximized = 3,
+    # Maximize = 3,
+    # ShowNormalNoActivate = 4,
+    # Show = 5,
+    # Minimize = 6,
+    # ShowMinNoActivate = 7,
+    # ShowNoActivate = 8,
+    # Restore = 9,
+    # ShowDefault = 10,
+    # ForceMinimized = 11
+
+    [Console.Window]::ShowWindow($consolePtr, 4)
+}
+
+function Hide-Console
+{
+    $consolePtr = [Console.Window]::GetConsoleWindow()
+    #0 hide
+    [Console.Window]::ShowWindow($consolePtr, 0)
+}
+
+Hide-Console
 
 $form.Topmost = $false
 
