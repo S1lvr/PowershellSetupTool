@@ -508,6 +508,18 @@ function Set-ChromeDefault
 	Start-Process SetDefaultBrowser.exe -Wait -ArgumentList "chrome"
 	Add-OutputBoxLine -Message "Chrome has been set as Default Web Browser."
 }
+function Get-TempFolder {
+	$Folder = "C:\Temp"
+	if (Test-Path -Path $Folder)
+	{
+		Set-Location "C:\Temp"
+	}
+	else
+	{
+		New-Item "C:\Temp" -Type Directory
+		Set-Location "C:\Temp"
+	} #make a folder to work out of, if it doesn't exist
+}
 #░██████╗████████╗░█████╗░██████╗░████████╗██╗░░░██╗██████╗░  ██╗████████╗███████╗███╗░░░███╗░██████╗
 #██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██║░░░██║██╔══██╗  ██║╚══██╔══╝██╔════╝████╗░████║██╔════╝
 #╚█████╗░░░░██║░░░███████║██████╔╝░░░██║░░░██║░░░██║██████╔╝  ██║░░░██║░░░█████╗░░██╔████╔██║╚█████╗░
@@ -780,6 +792,33 @@ function Set-PrivacySettings {
 	Start-Process powershell -ArgumentList "-f .\Set-Privacy.ps1 -enable -features Location,Radios,PhishingFilter"
 	[System.Windows.MessageBox]::Show('Privacy Settings Set.')
 }
+#░█████╗░██████╗░██╗░░██╗
+#██╔══██╗██╔══██╗██║░██╔╝
+#██║░░╚═╝██║░░██║█████═╝░
+#██║░░██╗██║░░██║██╔═██╗░
+#╚█████╔╝██████╔╝██║░╚██╗
+#░╚════╝░╚═════╝░╚═╝░░╚═╝
+function Install-CDK {
+	Get-TempFolder
+	Add-OutputBoxLine "Attempting to Static this PC for CDK install."
+	Do { #This loop will continuously make up Lab-usable IPs until it can't find anything on that IP.
+		#Once it can't find anything on that IP, we can static with it.
+		$Octet4 = Get-Random -Minimum 200 -Maximum 240
+		$script:testip = -join("10.120.3.", $Octet4)
+	} While (Test-Connection $script:testip)
+	$output = "PC has been static'd to " + $script:testip
+	Add-OutputBoxLine $output
+	Add-OutputBoxLine "Trying to install CDK, no idea if this works"
+	
+	Set-InstallStartupDirectory
+	Set-Location ".\RayHaskell"
+	Copy-Item ".\CDK_INSTALLER.zip" "C:\Temp\CDK_INSTALLER.zip"
+	Set-Location "C:\Temp"
+	Expand-Archive -Path ".\CDK_INSTALLER.zip" -DestinationPath "C:\Temp"
+	Remove-Item "C:\Temp\CDK_INSTALLER.zip"
+	Set-Location ".\WSPCP_EXP"
+	Start-Process ".\StartInstaller.exe"
+}
 #░██╗░░░░░░░██╗███████╗██████╗░██████╗░░█████╗░░█████╗░████████╗
 #░██║░░██╗░░██║██╔════╝██╔══██╗██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝
 #░╚██╗████╗██╔╝█████╗░░██████╦╝██████╔╝██║░░██║██║░░██║░░░██║░░░
@@ -821,16 +860,7 @@ function Install-Atera
 		[object]$ClientID
 	)
 	Add-OutputBoxLine "Creating Temp folder in C:\Temp"
-	$Folder = "C:\Temp"
-	if (Test-Path -Path $Folder)
-	{
-		Set-Location "C:\Temp"
-	}
-	else
-	{
-		New-Item "C:\Temp" -Type Directory
-		Set-Location "C:\Temp"
-	} #make a folder to work out of, if it doesn't exist
+	Get-TempFolder
 	Add-OutputBoxLine "Downloading Atera Installer..."
 	$webrequest = -join ("http://servicedesk.techsolutionsme.com/GetAgent/Msi/?customerId=", $ClientID, "&integratorLogin=jbard%40techsolutionsme.com")
 	#--------------------------------------
@@ -872,7 +902,7 @@ function Install-Epicor
 		# If Campbells Install Epicor V30
 		Add-OutputBoxLine "Installing Epicor v30 for Campbells..."
 		Set-Location .\InstallData\Campbells
-		Start-Process "setup.exe" -wait -ArgumentList "/s"
+		Start-Process "setup_30.exe" -wait -ArgumentList "/s"
 		Add-OutputBoxLine "Epicor v30 Installed."
 	}
 	else
@@ -884,7 +914,7 @@ function Install-Epicor
 			$a = new-object -comobject wscript.shell
 			$b = $a.popup($text, 0, $title, 0)
 		}
-		popUp "Epicor tried to install with no client name" "Error"
+		popUp "Epicor tried to install with unrecognised client" "Error"
 	}
 }
 #██████╗░░█████╗░░██╗░░░░░░░██╗███████╗██████╗░  ░██████╗███████╗████████╗████████╗██╗███╗░░██╗░██████╗░░██████╗
@@ -910,19 +940,7 @@ function Get-PowerSettingChanges
 function Install-NetEx
 {
 	Add-OutputBoxLine "Checking if Temp Folder exists in C:\Temp"
-	$Folder = "C:\Temp"
-	if (Test-Path -Path $Folder)
-	{
-		Add-OutputBoxLine "Folder exists, continuing"
-		Set-Location "C:\Temp"
-	}
-	else
-	{
-		Add-OutputBoxLine "Folder does not exist, making C:\Temp exist"
-		New-Item "C:\Temp" -Type Directory
-		Set-Location "C:\Temp"
-		Add-OutputBoxLine "C:\Temp exists, continuing"
-	} #make a folder to work out of, if it doesn't exist
+	Get-TempFolder
 	Add-OutputBoxLine "Downloading Net Extender Installer..."
 	$webrequest = "https://github.com/S1lvr/PowershellSetupTool/raw/main/InstallData/NetEx.MSI"
 	#--------------------------------------
