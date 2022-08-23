@@ -805,6 +805,8 @@ function Install-CDK {
 		#Once it can't find anything on that IP, we can static with it.
 		$Octet4 = Get-Random -Minimum 200 -Maximum 240
 		$script:testip = -join("10.120.3.", $Octet4)
+		Add-OutputBoxLine "Attempting Static to:"
+		Add-OutputBoxLine $script:testip
 	} While (Test-Connection $script:testip)
 	$output = "PC has been static'd to " + $script:testip
 	Add-OutputBoxLine $output
