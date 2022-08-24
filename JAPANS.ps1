@@ -66,11 +66,7 @@ $clientarray = @(
 #Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Finish Custom Client UI ( Domain Settings )
 #Todo: See about pushing all Clients to Custom System, to allow making a proper progress bar.
-#Todo: See if change startup items script works.
-#Todo: Maybe we make it install gitcli, so it can upload custom client files, and download new ones. https://github.com/dahlbyk/posh-git
-#	 * On top of this, Git does have a portable version.
-#Todo: See about removing bloatware. maybe with https://github.com/Sycnex/Windows10Debloater
-#Todo: Have script pull installers that need updating fresh from github
+#Todo: See if change startup items script work.
 function Get-Mabel_Wadsworth
 {
     Set-NewPCName
@@ -114,6 +110,7 @@ function Get-Century_21_SRE
 	Install-Reader
 	Get-PowerSettingChanges
 	Set-TSMPassword -password "C21workstation!"
+	Set-AzureADAccount
 	Add-OutputBoxLine -Message "Setup Completed."
 	Resolve-ProgressBar
 }
@@ -209,6 +206,7 @@ function Get-Ware_Butler #Name of function, if you check the list near the botto
 	Install-Reader #Install Reader
 	Get-PowerSettingChanges #This will open a batch file to set power settings
 	Set-TSMPassword -password "WBworkstation!" #Set the password to match standard convention for TSMAdmin
+	Set-AzureADAccount
 	Add-OutputBoxLine "Setup Completed." #Say it's done in the output box
 	Resolve-ProgressBar #Make sure the progress bar doesn't make us a liar.
 }
@@ -520,6 +518,40 @@ function Get-TempFolder {
 		Set-Location "C:\Temp"
 	} #make a folder to work out of, if it doesn't exist
 }
+function Set-StaticIP {
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   Position = 0)]
+		[string]$IP,
+		[Parameter(Mandatory = $true,
+				   Position = 1)]
+		[string]$Gateway
+		
+	)
+	#$IP = $ipaddr
+	$MaskBits = 24 # This means subnet mask = 255.255.255.0
+	#$Gateway = $gatewayaddr
+	$Dns = "1.1.1.1"
+	$IPType = "IPv4"
+	# Retrieve the network adapter that you want to configure
+	$adapter = Get-NetAdapter | ? {$_.Status -eq "up"}
+	# Remove any existing IP, gateway from our ipv4 adapter
+	If (($adapter | Get-NetIPConfiguration).IPv4Address.IPAddress) {
+ 		$adapter | Remove-NetIPAddress -AddressFamily $IPType -Confirm:$false
+	}
+	If (($adapter | Get-NetIPConfiguration).Ipv4DefaultGateway) {
+ 		$adapter | Remove-NetRoute -AddressFamily $IPType -Confirm:$false
+	}
+ 	# Configure the IP address and default gateway
+	$adapter | New-NetIPAddress `
+ 	-AddressFamily $IPType `
+ 	-IPAddress $IP `
+ 	-PrefixLength $MaskBits `
+ 	-DefaultGateway $Gateway
+	# Configure the DNS client server IP addresses
+	$adapter | Set-DnsClientServerAddress -ServerAddresses $DNS
+}
 #░██████╗████████╗░█████╗░██████╗░████████╗██╗░░░██╗██████╗░  ██╗████████╗███████╗███╗░░░███╗░██████╗
 #██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██║░░░██║██╔══██╗  ██║╚══██╔══╝██╔════╝████╗░████║██╔════╝
 #╚█████╗░░░░██║░░░███████║██████╔╝░░░██║░░░██║░░░██║██████╔╝  ██║░░░██║░░░█████╗░░██╔████╔██║╚█████╗░
@@ -578,6 +610,17 @@ function Disable-Startups #I took this entire function from StackOverflow with 0
         }
     }
     end {}
+	
+
+#░█████╗░███████╗██╗░░░██╗██████╗░███████╗ ░█████╗░██████╗░
+#██╔══██╗╚════██║██║░░░██║██╔══██╗██╔════╝ ██╔══██╗██╔══██╗
+#███████║░░███╔═╝██║░░░██║██████╔╝█████╗░░ ███████║██║░░██║
+#██╔══██║██╔══╝░░██║░░░██║██╔══██╗██╔══╝░░ ██╔══██║██║░░██║
+#██║░░██║███████╗╚██████╔╝██║░░██║███████╗ ██║░░██║██████╔╝
+#╚═╝░░╚═╝╚══════╝░╚═════╝░╚═╝░░╚═╝╚══════╝ ╚═╝░░╚═╝╚═════╝░
+function Set-AzureADAccount {
+	Add-OutputBoxLine "Opening Place to add to AzureAD"
+	Start-Process ms-settings:workplace
 }
 #██████╗░███╗░░██╗░██████╗  ░░░░██╗  ██████╗░░█████╗░███╗░░░███╗░█████╗░██╗███╗░░██╗
 #██╔══██╗████╗░██║██╔════╝  ░░░██╔╝  ██╔══██╗██╔══██╗████╗░████║██╔══██╗██║████╗░██║
@@ -805,9 +848,22 @@ function Install-CDK {
 		#Once it can't find anything on that IP, we can static with it.
 		$Octet4 = Get-Random -Minimum 200 -Maximum 240
 		$script:testip = -join("10.120.3.", $Octet4)
-		Add-OutputBoxLine "Attempting Static to:"
+		Add-OutputBoxLine "Testing Static IP:"
 		Add-OutputBoxLine $script:testip
-	} While (Test-Connection $script:testip)
+		Set-StaticIP -ip $script:testip -gateway "10.5.190.127"
+		if (Test-NetConnection 1.1.1.1 -eq true) {
+			Add-OutputBoxLine "Test successful, IP address set and connectivity confirmed."
+			$script:iptest = $false
+		} else {
+			Add-OutputBoxLine "Test unsuccessful, IP Address set incorrectly, or computer has no internet otherwise."
+			$script:iptest = $true
+		}
+	} While ($script:iptest -eq $true)
+	#
+	# Static IP Address to $script:testip Here
+	# Use 10.5.190.127 for Gateway.
+	# Check for connection to Gateway first.
+	#
 	$output = "PC has been static'd to " + $script:testip
 	Add-OutputBoxLine $output
 	Add-OutputBoxLine "Trying to install CDK, no idea if this works"
