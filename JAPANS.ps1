@@ -185,8 +185,9 @@ function Get-Ray_Haskell_Ford
 	Install-Webroot 8DF6-ATRA-720C-25F4-4595
 	Install-GChrome
 	Set-ChromeDefault
-	Install-OfficeInstaller
 	Install-Reader
+	Install-CDK
+	Install-OfficeInstaller
 	Get-PowerSettingChanges
 	Set-TSMPassword -password "RHworkstation!"
 	Set-DNSAndDomain -DNSServer "10.5.190.202" -DomainServer "haskell.local"
@@ -206,7 +207,7 @@ function Get-Ware_Butler #Name of function, if you check the list near the botto
 	Install-Reader #Install Reader
 	Get-PowerSettingChanges #This will open a batch file to set power settings
 	Set-TSMPassword -password "WBworkstation!" #Set the password to match standard convention for TSMAdmin
-	Set-AzureADAccount
+	Set-AzureADAccount #I just made this one, it just opens the settings window to add a computer to a domain.
 	Add-OutputBoxLine "Setup Completed." #Say it's done in the output box
 	Resolve-ProgressBar #Make sure the progress bar doesn't make us a liar.
 }
@@ -558,11 +559,8 @@ function Set-StaticIP {
 #░╚═══██╗░░░██║░░░██╔══██║██╔══██╗░░░██║░░░██║░░░██║██╔═══╝░  ██║░░░██║░░░██╔══╝░░██║╚██╔╝██║░╚═══██╗
 #██████╔╝░░░██║░░░██║░░██║██║░░██║░░░██║░░░╚██████╔╝██║░░░░░  ██║░░░██║░░░███████╗██║░╚═╝░██║██████╔╝
 #╚═════╝░░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░  ╚═╝░░░╚═╝░░░╚══════╝╚═╝░░░░░╚═╝╚═════╝░
-function Disable-Startups #I took this entire function from StackOverflow with 0 shame.
+function Disable-Startups {#I took this entire function from StackOverflow with 0 shame.
 #Jsc, et al. “Disabling Startup Programs.” Stack Overflow, 18 Oct, 2018, https://stackoverflow.com/questions/52692879/disabling-startup-programs. 
-{
-    [CmdletBinding()]
-
     Param
     (
         [parameter(DontShow = $true)]
@@ -610,7 +608,7 @@ function Disable-Startups #I took this entire function from StackOverflow with 0
         }
     }
     end {}
-	
+}
 
 #░█████╗░███████╗██╗░░░██╗██████╗░███████╗ ░█████╗░██████╗░
 #██╔══██╗╚════██║██║░░░██║██╔══██╗██╔════╝ ██╔══██╗██╔══██╗
@@ -843,39 +841,38 @@ function Set-PrivacySettings {
 #░╚════╝░╚═════╝░╚═╝░░╚═╝
 function Install-CDK {
 	Get-TempFolder
+	Add-OutputBoxLine "Installing .NET 3.5 so CDK won't complain..."
+	Enable-WindowsOptionalFeature -Online -FeatureName "NetFx3"
 	Add-OutputBoxLine "Attempting to Static this PC for CDK install."
 	Do { #This loop will continuously make up Lab-usable IPs until it can't find anything on that IP.
 		#Once it can't find anything on that IP, we can static with it.
-		$Octet4 = Get-Random -Minimum 200 -Maximum 240
-		$script:testip = -join("10.120.3.", $Octet4)
+		$Octet4 = Get-Random -Minimum 200 -Maximum 240 #choose a random number between 200 and 240
+		$script:testip = -join("10.120.3.", $Octet4) #create an IP with this following the lab's convention
 		Add-OutputBoxLine "Testing Static IP:"
+		Start-Sleep 5 #Wait a few seconds to identify the network.
 		Add-OutputBoxLine $script:testip
-		Set-StaticIP -ip $script:testip -gateway "10.5.190.127"
-		if (Test-NetConnection 1.1.1.1 -eq true) {
+		Set-StaticIP -ip $script:testip -gateway "10.5.190.127" # Set IP to pre-created IP, set gateway to the gateway at RHF
+		if (Test-NetConnection 1.1.1.1 -eq true) { #If the computer can still access the internet,
 			Add-OutputBoxLine "Test successful, IP address set and connectivity confirmed."
-			$script:iptest = $false
-		} else {
+			$script:iptest = $false #Mark this as false so we can stop the loop
+		} else { #If it can't access the internet,
 			Add-OutputBoxLine "Test unsuccessful, IP Address set incorrectly, or computer has no internet otherwise."
-			$script:iptest = $true
+			$script:iptest = $true #Keep it true so we can try a new IP.
 		}
 	} While ($script:iptest -eq $true)
-	#
-	# Static IP Address to $script:testip Here
-	# Use 10.5.190.127 for Gateway.
-	# Check for connection to Gateway first.
-	#
 	$output = "PC has been static'd to " + $script:testip
 	Add-OutputBoxLine $output
 	Add-OutputBoxLine "Trying to install CDK, no idea if this works"
-	
+	# ok let's try it
 	Set-InstallStartupDirectory
-	Set-Location ".\RayHaskell"
-	Copy-Item ".\CDK_INSTALLER.zip" "C:\Temp\CDK_INSTALLER.zip"
+	Get-TempFolder #This makes sure our custom Temp folder exists
+	Set-Location ".\RayHaskell" #Go into the RHF folder
+	Copy-Item ".\CDK_INSTALLER.zip" "C:\Temp\CDK_INSTALLER.zip" #Copy CDK to the temp folder
 	Set-Location "C:\Temp"
-	Expand-Archive -Path ".\CDK_INSTALLER.zip" -DestinationPath "C:\Temp"
-	Remove-Item "C:\Temp\CDK_INSTALLER.zip"
-	Set-Location ".\WSPCP_EXP"
-	Start-Process ".\StartInstaller.exe"
+	Expand-Archive -Path ".\CDK_INSTALLER.zip" -DestinationPath "C:\Temp" #Open the CDK .zip folder
+	Remove-Item "C:\Temp\CDK_INSTALLER.zip" #Remove the .zip when we're done
+	Set-Location ".\WSPCP_EXP" #Go into the folder that was in the .zip
+	Start-Process ".\StartInstaller.exe" -wait #Start the CDK installer.
 }
 #░██╗░░░░░░░██╗███████╗██████╗░██████╗░░█████╗░░█████╗░████████╗
 #░██║░░██╗░░██║██╔════╝██╔══██╗██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝
