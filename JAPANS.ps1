@@ -56,6 +56,7 @@ $clientarray = @(
 	"Rockland Realty"
     "Mabel Wadsworth"
 	"United Way TVA"
+	"Harris Lumber"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -87,9 +88,9 @@ function Get-United_Way_TVA
 	Get-PowerSettingChanges
 	Set-TSMPassword -password "UWTVAworkstation!"
 	Set-AzureADAccount
-	Add-OutputBoxLine -Message "Setup Completed."
 	Install-OfficeInstaller
-	
+	Add-OutputBoxLine -Message "Setup Completed."
+	Resolve-ProgressBar
 }
 function Get-Mabel_Wadsworth
 {
@@ -216,6 +217,22 @@ function Get-Ray_Haskell_Ford
 	Set-TSMPassword -password "RHworkstation!"
 	Set-DNSAndDomain -DNSServer "10.5.190.202" -DomainServer "haskell.local"
 	Add-OutputBoxLine "Setup Complete."
+	Resolve-ProgressBar
+}
+function Get-Harris_Lumber
+{
+	Set-NewPCName
+	Install-Atera 98
+	Install-Webroot 21DA-ATRA-CC82-EC91-4DF6
+	Install-Epicor WB
+	Install-NetEx
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Install-OfficeInstaller
+	Set-TSMPassword -password "WBworkstation!"
+	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
 }
 function Get-Ware_Butler #Name of function, if you check the list near the bottom, the list entry is Ware_Butler, so this is Get-Ware_Butler

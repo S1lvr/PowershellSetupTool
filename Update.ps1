@@ -12,7 +12,7 @@ Get-Content $versionfile | ForEach-Object {
 Get-Content $newversionfile | ForEach-Object { #These two grab the number in the ini to know if the local or github is larger
     $script:newversion = $_.ToInt32($Null)
 }
-If ($newversionfile -gt $versionfile) { #If it's larger, remove old script and download a new one
+If ($script:newversionfile -gt $script:versionfile) { #If it's larger, remove old script and download a new one
     Write-Host "New version found, updating..."
     Remove-Item -Path .\JAPANS.ps1
     Write-Host "Deleted Old Script..."
@@ -35,5 +35,7 @@ If ($newversionfile -gt $versionfile) { #If it's larger, remove old script and d
 }
 
 Remove-Item .\version.ini
+Remove-Item .\newfilelist.ini
 Write-Host "Running Script Now..."
+Start-Sleep 2
 start-process Powershell -ArgumentList "-f .\JAPANS.ps1"
