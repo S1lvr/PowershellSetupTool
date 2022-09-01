@@ -55,6 +55,7 @@ $clientarray = @(
 	"Century 21 SRE"
 	"Rockland Realty"
     "Mabel Wadsworth"
+	"United Way TVA"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -63,10 +64,33 @@ $clientarray = @(
 # Next Add commands to the function, for extra help, Ware Butler's function is
 # Completely Commented.
 #-----------
-#Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Finish Custom Client UI ( Domain Settings )
 #Todo: See about pushing all Clients to Custom System, to allow making a proper progress bar.
-#Todo: See if change startup items script work.
+#Todo: See if change in startup items script work.
+#*Config Changes:
+#Todo: Set up a "run just this command" option so I can do this easier.
+#Todo:	Install Chrome/Reader
+#Todo:	Install Atera
+#Todo:	Install WebRoot
+#Todo:	Install Office
+#Todo:	Add to Domain
+#Todo:	Rename PC
+#Todo:	Add to AzureAD
+function Get-United_Way_TVA
+{
+	Set-NewPCName
+	Install-Atera 24
+	Install-Webroot B471-ATRA-B1A3-003E-4713
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword -password "UWTVAworkstation!"
+	Set-AzureADAccount
+	Add-OutputBoxLine -Message "Setup Completed."
+	Install-OfficeInstaller
+	
+}
 function Get-Mabel_Wadsworth
 {
     Set-NewPCName
@@ -94,7 +118,7 @@ function Get-Rockland_Realty
 	Install-Reader
 	Get-PowerSettingChanges
 	Set-TSMPassword -password "RRworkstation!"
-	Set-DNSAndDomain -DNSServer "10.146.72.211" -DomainServer "RR.local"
+	[System.Windows.MessageBox]::Show("Rockland Realty has a weird system, you can't add to their domain unless you on-site so. Good Luck.")
 	Add-OutputBoxLine -Message "Setup Completed."
 	Resolve-ProgressBar
 }
@@ -497,6 +521,14 @@ function Set-TSMPassword
 		[parameter(Mandatory = $true, Position = 0)]
 		[String]$password 
 	)
+	$TSMUser = Get-LocalUser -Name "TSMAdmin"
+	if ($null -eq $TSMUser) {
+		Add-OutputBoxLine "TSMAdmin account not found, creating..."
+		New-LocalUser -Name "TSMAdmin" -NoPassword
+	} else {
+		Add-OutputBoxLine "TSMAdmin account found,"
+	}
+	Add-OutputBoxLine "Setting TSMAdmin Password..."
 	$tsmpass = ConvertTo-SecureString $password -AsPlainText -Force
 	$UserAccount = Get-LocalUser -Name "TSMAdmin"
 	$UserAccount | Set-LocalUser -Password $tsmpass
@@ -586,26 +618,41 @@ function Disable-Startups {#I took this entire function from StackOverflow with 
 		'Skype'
 		'Send to OneNote Tool'
         )
-        New-PSDrive -PSProvider Registry -Name HKU -Root HKEY_USERS | 
-        out-null
-        $startups = Get-CimInstance Win32_StartupCommand | 
-        Select-Object Name,Location
+        New-PSDrive -PSProvider Registry -Name HKU -Root HKEY_USERS | out-null
+        $startups = Get-CimInstance Win32_StartupCommand | Select-Object Name,Location
     }
     process 
     {
-        Get-Item -path $32bit,$32bitRunOnce,$64bit,$64bitRunOnce,$currentLOU,$currentLOURunOnce |
-        Where-Object {$_.ValueCount -ne 0} | 
-        Select-Object  @{Name = 'Location';Expression = {$_.name -replace 'HKEY_LOCAL_MACHINE','HKLM' -replace 'HKEY_CURRENT_USER','HKCU'}},
-        @{Name = 'Name';Expression = {$_.Property}} | 
-        ForEach-Object{
-            ForEach($disableListName in $disableList)
-            {
-                If($_.Name -contains $disableListName)
-                { $_ | Select-Object -Property Location,Name }
-                Else
-                { Write-Warning -Message "$disableListName not found in registry" }
+		foreach ($startUp in $startUps){
+            if ($startUp.Name -in $disableList){
+                $number = ($startUp.Location).IndexOf("\")
+                $location = ($startUp.Location).Insert("$number",":")
+                Write-Output "Disabling $($startUp.Name) from $location)"
+                #Remove-ItemProperty -Path "$location" -Name "$($startUp.name)" 
             }
         }
+        $regStartList = Get-Item -path $32bit,$32bitRunOnce,$64bit,$64bitRunOnce,$currentLOU,$currentLOURunOnce |
+		Where-Object {$_.ValueCount -ne 0} | Select-Object  property,name
+
+		foreach ($regName in $regStartList.name) {
+   		$regNumber = ($regName).IndexOf("\")
+   		$regLocation = ($regName).Insert("$regNumber",":")
+   		if ($regLocation -like "*HKEY_LOCAL_MACHINE*"){
+    	$regLocation = $regLocation.Replace("HKEY_LOCAL_MACHINE","HKLM")
+    	write-host $regLocation
+   		}
+   		if ($regLocation -like "*HKEY_CURRENT_USER*"){
+    	$regLocation = $regLocation.Replace("HKEY_CURRENT_USER","HKCU")
+    	write-host $regLocation
+   }
+    foreach($disable in $disableList) {
+       if (Get-ItemProperty -Path "$reglocation" -name "$Disable"-ErrorAction SilentlyContinue) {
+            Write-host "yeah i exist"
+            #Remove-ItemProperty -Path "$location" -Name "$($startUp.name)" -whatif
+       }else {write-host "no exist"}
+    }   
+
+}
     }
     end {}
 }
