@@ -406,4 +406,8 @@ Catch {
     Write-Log -Message $mainErrorMessage -Severity 3 -Source $deployAppScriptFriendlyName
     Show-DialogBox -Text $mainErrorMessage -Icon 'Stop'
     Exit-Script -ExitCode $mainExitCode
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b18a7f4fbe738a9fbf4f785da96623913835ee5c
