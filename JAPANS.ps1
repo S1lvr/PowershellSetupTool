@@ -70,6 +70,7 @@ $clientarray = @(
 #Todo: See if change in startup items script work.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
+#Todo: Run This Options:
 #Todo:	Install Chrome/Reader
 #Todo:	Install Atera
 #Todo:	Install WebRoot
@@ -211,7 +212,7 @@ function Get-Ray_Haskell_Ford
 	Install-GChrome
 	Set-ChromeDefault
 	Install-Reader
-	Install-CDK
+	#Install-CDK
 	Install-OfficeInstaller
 	Get-PowerSettingChanges
 	Set-TSMPassword -password "RHworkstation!"
