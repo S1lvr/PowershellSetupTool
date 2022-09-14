@@ -226,6 +226,7 @@ function Get-Harris_Lumber
 	Install-Atera 98
 	Install-Webroot 21DA-ATRA-CC82-EC91-4DF6
 	Install-Epicor WB
+	Install-Compass
 	Install-NetEx
 	Install-GChrome
 	Set-ChromeDefault
@@ -1036,6 +1037,20 @@ function Install-Epicor
 		}
 		popUp "Epicor tried to install with unrecognised client" "Error"
 	}
+}
+#░█████╗░░█████╗░███╗░░░███╗██████╗░░█████╗░░██████╗░██████╗
+#██╔══██╗██╔══██╗████╗░████║██╔══██╗██╔══██╗██╔════╝██╔════╝
+#██║░░╚═╝██║░░██║██╔████╔██║██████╔╝███████║╚█████╗░╚█████╗░
+#██║░░██╗██║░░██║██║╚██╔╝██║██╔═══╝░██╔══██║░╚═══██╗░╚═══██╗
+#╚█████╔╝╚█████╔╝██║░╚═╝░██║██║░░░░░██║░░██║██████╔╝██████╔╝
+#░╚════╝░░╚════╝░╚═╝░░░░░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚═════╝░╚═════╝░
+function Install-Compass {
+	Add-OutputBoxLine "Installing Compass for Epicor..."
+	Set-Location $working
+	Set-Location .\InstallData\Harris
+	Add-OutputBoxLine "Defaults are fine, just make sure to set all 3 IPs to the Epicor Server."
+	Start-Process "CompassInstaller.exe" -Wait
+	Add-OutputBoxLine "Compass for Epicor installed."
 }
 #██████╗░░█████╗░░██╗░░░░░░░██╗███████╗██████╗░  ░██████╗███████╗████████╗████████╗██╗███╗░░██╗░██████╗░░██████╗
 #██╔══██╗██╔══██╗░██║░░██╗░░██║██╔════╝██╔══██╗  ██╔════╝██╔════╝╚══██╔══╝╚══██╔══╝██║████╗░██║██╔════╝░██╔════╝
