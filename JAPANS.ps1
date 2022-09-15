@@ -105,7 +105,7 @@ function Get-CB_Mattson
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
-	Set-TSMPassword -password "CBworkstation!"
+	Set-TSMPassword -password "CBMworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.1.15" -DomainServer "CB-Mattson.loc"
 	Install-OfficeInstaller
 	Add-OutputBoxLine -Message "Setup Completed."
