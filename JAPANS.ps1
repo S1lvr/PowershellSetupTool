@@ -59,6 +59,7 @@ $clientarray = @(
 	"United Way TVA"
 	"Harris Lumber"
 	"CB Mattson"
+	"Maine Center for Dental Medicine"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -79,6 +80,22 @@ $clientarray = @(
 #Todo:	Add to Domain
 #Todo:	Rename PC
 #Todo:	Add to AzureAD
+function Get-Maine_Center_for_Dental_Medicine
+{
+    Set-NewPCName
+	Install-Atera 11
+	Install-Webroot A17D-ATRA-C256-BC28-4CA2
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword -password "MCDMworkstation!"
+	Set-DNSAndDomain -DNSServer "192.168.2.53" -DomainServer "MCDM.local"
+	Install-EagleSoft
+	Install-OfficeInstaller
+	Add-OutputBoxLine -Message "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-CB_Mattson
 {
 	Set-NewPCName
@@ -916,6 +933,26 @@ function Set-PrivacySettings {
 	Start-Process powershell -ArgumentList "-f .\Set-Privacy.ps1 -Balanced"
 	Start-Process powershell -ArgumentList "-f .\Set-Privacy.ps1 -enable -features Location,Radios,PhishingFilter"
 	[System.Windows.MessageBox]::Show('Privacy Settings Set.')
+}
+#███████╗░█████╗░░██████╗░██╗░░░░░███████╗░██████╗░█████╗░███████╗████████╗
+#██╔════╝██╔══██╗██╔════╝░██║░░░░░██╔════╝██╔════╝██╔══██╗██╔════╝╚══██╔══╝
+#█████╗░░███████║██║░░██╗░██║░░░░░█████╗░░╚█████╗░██║░░██║█████╗░░░░░██║░░░
+#██╔══╝░░██╔══██║██║░░╚██╗██║░░░░░██╔══╝░░░╚═══██╗██║░░██║██╔══╝░░░░░██║░░░
+#███████╗██║░░██║╚██████╔╝███████╗███████╗██████╔╝╚█████╔╝██║░░░░░░░░██║░░░
+#╚══════╝╚═╝░░╚═╝░╚═════╝░╚══════╝╚══════╝╚═════╝░░╚════╝░╚═╝░░░░░░░░╚═╝░░░
+function Install-EagleSoft {
+	Get-TempFolder
+	Add-OutputBoxLine "Installing Eaglesoft..."
+	$EaglesoftLocation = "\\mcfdm-file\Eaglesoft\ESInstall\Media"
+	$EaglesoftTest = Test-Path -Path $EaglesoftLocation
+	Do { #This is just a loop to keep going as long as it can't see the eaglesoft folder, in case someone forgot the tunnel so you don't just have it fail.
+		Add-OutputBoxLine "Trying to connect to Eaglesoft folder, please make sure the tunnel is open..."
+		Start-Sleep 3
+	} while (-not $EaglesoftTest)
+	Set-Location $EaglesoftLocation
+	Add-OutputBoxLine "YOU WILL NEED THE EAGLESOFT LICENSE KEY!"
+	Add-OutputBoxLine "THIS IS IN ITPORTAL."
+	Start-Process essetup.exe -verb runas
 }
 #░█████╗░██████╗░██╗░░██╗
 #██╔══██╗██╔══██╗██║░██╔╝
