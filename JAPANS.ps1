@@ -34,6 +34,7 @@ $myname = $MyInvocation.MyCommand.Name
 $pos = $workfolder.IndexOf($myname)
 $working = $workfolder.Substring(0, $pos)
 Set-Location $working
+Import-Module -name .\InstallData\SFTA.ps1
 # --------------------------------------------------------------------------------------------------
 #░█████╗░██╗░░░░░██╗███████╗███╗░░██╗████████╗░██████╗
 #██╔══██╗██║░░░░░██║██╔════╝████╗░██║╚══██╔══╝██╔════╝
@@ -57,6 +58,7 @@ $clientarray = @(
     "Mabel Wadsworth"
 	"United Way TVA"
 	"Harris Lumber"
+	"CB Mattson"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -66,7 +68,6 @@ $clientarray = @(
 # Completely Commented.
 #-----------
 #Todo: Finish Custom Client UI ( Domain Settings )
-#Todo: See about pushing all Clients to Custom System, to allow making a proper progress bar.
 #Todo: See if change in startup items script work.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
@@ -78,10 +79,25 @@ $clientarray = @(
 #Todo:	Add to Domain
 #Todo:	Rename PC
 #Todo:	Add to AzureAD
+function Get-CB_Mattson
+{
+	Set-NewPCName
+	Install-Atera 38
+	Install-Webroot 5A76-ATRA-04A6-8F94-425E
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword -password "CBworkstation!"
+	Set-DNSAndDomain -DNSServer "192.168.1.15" -DomainServer "CB-Mattson.loc"
+	Install-OfficeInstaller
+	Add-OutputBoxLine -Message "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-United_Way_TVA
 {
 	Set-NewPCName
-	Install-Atera 24
+	Install-Atera 
 	Install-Webroot B471-ATRA-B1A3-003E-4713
 	Install-GChrome
 	Set-ChromeDefault
@@ -470,12 +486,14 @@ function Get-Custom
 function Set-DefaultMail { # Thank you Mr. Random Czech Microsoft Dev for making this easy.
     Set-InstallStartupDirectory
     Start-Process SetUserFTA.exe -Wait -ArgumentList "mailto Outlook.URL.mailto.15"
+	# Set-FTA Outlook.URL.mailto.15 mailto # This is for integration of the SFTA.ps1 script
 	#If you want to use this for other things, you have to "SetUserFTA.exe get" first.
 	#Grab the info you need from the associations, then use that.
 }
 function Set-DefaultPDF {
     Set-InstallStartupDirectory
     Start-Process SetUserFTA.exe -Wait -ArgumentList ".pdf AcroExch.Document.DC"
+	# Set-FTA AcroExch.Document.DC .pdf
 }
 #Windows 10 Pin Removal
 function Invoke-Win10PinRemoval #this was already a powershell script. Ctrl + C and Ctrl + V my guy.
