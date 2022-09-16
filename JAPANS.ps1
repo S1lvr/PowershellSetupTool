@@ -72,6 +72,7 @@ $clientarray = @(
 #Todo: Finish Custom Client UI ( Domain Settings )
 #Todo: See if change in startup items script work.
 #Todo: Incorporate Start-Job so the loading bar doesn't freeze. / Partially Done
+#Todo: Try installing PSWindowsUpdate and have it grab as many updates as it can at the start of the setup so the PC can be restarted at the end.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Run This Options:
