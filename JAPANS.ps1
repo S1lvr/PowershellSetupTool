@@ -1588,7 +1588,7 @@ function Hide-Console
     [Console.Window]::ShowWindow($consolePtr, 0)
 }
 
-#Hide-Console
+Hide-Console
 
 $form.Topmost = $false
 
