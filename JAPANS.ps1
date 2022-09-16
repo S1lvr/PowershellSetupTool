@@ -83,6 +83,7 @@ $clientarray = @(
 #Todo:	Add to Domain
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
+#Todo:  NetEx Installer
 function Get-Granite_Corp
 {
 	Set-NewPCName
@@ -122,6 +123,7 @@ function Get-CB_Mattson
 	Install-GChrome
 	Set-ChromeDefault
 	Install-Reader
+	Install-NetEx
 	Get-PowerSettingChanges
 	Set-TSMPassword -password "CBMworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.1.15" -DomainServer "CB-Mattson.loc"

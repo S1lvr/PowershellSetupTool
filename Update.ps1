@@ -6,9 +6,11 @@ Invoke-WebRequest -Uri $versioncheck -OutFile .\version.ini #Download the versio
 $newversionfile = ".\version.ini"
 Get-Content $versionfile | ForEach-Object {
     $script:currentversion = $_.ToInt32($Null)
+    Write-Host "You are running v$script:currentversion"
 }
 Get-Content $newversionfile | ForEach-Object { #These two grab the number in the ini to know if the local or github is larger
     $script:newversion = $_.ToInt32($Null)
+    Write-Host "Newest is v$script:newversion"
 }
 If ($script:currentversion -lt $script:newversion){
     Write-Host "New version found, updating..."
