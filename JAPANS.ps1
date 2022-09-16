@@ -60,6 +60,7 @@ $clientarray = @(
 	"Harris Lumber"
 	"CB Mattson"
 	"Maine Center for Dental Medicine"
+	"Granite Corp"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -70,6 +71,7 @@ $clientarray = @(
 #-----------
 #Todo: Finish Custom Client UI ( Domain Settings )
 #Todo: See if change in startup items script work.
+#Todo: Incorporate Start-Job so the loading bar doesn't freeze. / Partially Done
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Run This Options:
@@ -80,6 +82,21 @@ $clientarray = @(
 #Todo:	Add to Domain
 #Todo:	Rename PC
 #Todo:	Add to AzureAD
+function Get-Granite_Corp
+{
+	Set-NewPCName
+	Install-Atera 3
+	Install-Webroot 5477-ATRA-AAEC-93E6-450E
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword -password "GCworkstation!"
+	Set-DNSAndDomain -DNSServer "192.168.16.3" -DomainServer "Granite-Corp.com"
+	Install-OfficeInstaller
+	Add-OutputBoxLine -Message "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Maine_Center_for_Dental_Medicine
 {
     Set-NewPCName
@@ -532,6 +549,18 @@ function Invoke-Win10PinRemoval #this was already a powershell script. Ctrl + C 
 		Remove-Item -path $passportFolder -recurse -force
 	}
 	Add-OutputBoxLine "Ran Windows 10 Pin Removal Script."
+}
+function Perform-SetupStep
+{
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory = $true,
+				   Position = 0)]
+		[string]
+		$command
+	)
+	Start-Job -name "SetupStep" -ScriptBlock $command
+	Wait-Job -Name "SetupStep"
 }
 function Get-SuperInput #I made this for the old custom system but I like it too much to get rid of it
 {
@@ -1418,9 +1447,13 @@ $LocalAdminButton.Size = New-Object System.Drawing.Size(175, 23)
 $LocalAdminButton.Text = 'Make Local Admin'
 $tab2.Controls.Add($LocalAdminButton)
 $LocalAdminButton.Add_Click({
-	$username = -join ($env:USERDOMAIN, "\", $env:USERNAME)
+	$computer = $env:COMPUTERNAME
+	$username = (Get-WmiObject -Class win32_process -ComputerName $computer | Where-Object name -Match explorer).getowner().user
+	#$username = -join ($env:USERDOMAIN, "\", $env:USERNAME)
+	#$username = Get-ChildItem "\\$computer\c$\Users" | Sort-Object LastWriteTime -Descending | Select-Object Name, LastWriteTime -first 1
+	# Try the second one if this new one doesn't work
 	Add-LocalGroupMember -Group "Administrators" -Member $username
-	$message = -join("User ", $env:USERNAME, " added as local admin")
+	$message = -join("User ", $username, " added as local admin")
 	[System.Windows.MessageBox]::Show($message)
 })
 
