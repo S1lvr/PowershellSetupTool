@@ -76,12 +76,12 @@ $clientarray = @(
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Run This Options:
-#Todo:	Install Chrome/Reader
-#Todo:	Install Atera
+#Todo:	Install Chrome/Reader / Done
+#Todo:	Install Atera / Done
 #Todo:	Install WebRoot
-#Todo:	Install Office
+#Todo:	Install Office / Done
 #Todo:	Add to Domain
-#Todo:	Rename PC
+#Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 function Get-Granite_Corp
 {
@@ -1491,6 +1491,61 @@ $BloatwareButton.Add_Click({
 	[System.Windows.MessageBox]::Show('Bloatware From List Removed.')
 })
 
+#Create Manual Tab
+$Tab3 = New-object System.Windows.Forms.Tabpage
+$Tab3.DataBindings.DefaultDataSourceUpdateMode = 0
+$Tab3.UseVisualStyleBackColor = $True
+$Tab3.Name = "Tab3"
+$Tab3.Text = "Manual"
+$FormTabControl.Controls.Add($Tab3)
+
+# Create Atera Button
+$Aterabutton = New-Object System.Windows.Forms.Button
+$Aterabutton.Location = New-Object System.Drawing.Point(20, 25)
+$Aterabutton.Size = New-Object System.Drawing.Size(175, 23)
+$Aterabutton.Text = 'Install Atera from box'
+$tab3.Controls.Add($Aterabutton)
+$Aterabutton.Add_Click({
+	Install-Atera $Aterabox.Text
+})
+# Create Atera Text Box
+$Aterabox = New-Object System.Windows.Forms.TextBox
+$AteraBox.Location = New-Object System.Drawing.Point(20, 50)
+$Aterabox.Size = New-Object System.Drawing.Size(175, 23)
+$tab3.Controls.Add($Aterabox)
+
+# Create Chrome/Adobe Button
+$ChradobeButton = New-Object System.Windows.Forms.Button
+$ChradobeButton.Location = New-Object System.Drawing.Point(20, 75)
+$ChradobeButton.Size = New-Object System.Drawing.Size(175, 23)
+$ChradobeButton.Text = 'Install Chrome/Adobe'
+$tab3.Controls.Add($ChradobeButton)
+$ChradobeButton.Add_click({
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+})
+
+# Install Office Button
+$OfficeButton = New-Object System.Windows.Forms.Button
+$OfficeButton.Location = New-Object System.Drawing.Point(20, 100)
+$OfficeButton.Size = New-Object System.Drawing.Size(175, 23)
+$OfficeButton.Text = 'Install Office'
+$tab3.Controls.Add($OfficeButton)
+$OfficeButton.Add_Click({
+	Install-OfficeInstaller
+})
+
+#Rename PC Button
+$RenameButton = New-Object System.Windows.Forms.Button
+$RenameButton.Location = New-Object System.Drawing.Point (20, 125)
+$RenameButton.Size = New-Object System.Drawing.Size(175, 23)
+$RenameButton.Text = 'Rename this PC'
+$tab3.Controls.Add($RenameButton)
+$RenameButton.Add_Click({
+	Set-NewPCName
+})
+
 #
 # This whole part just hides the console window
 #
@@ -1531,7 +1586,7 @@ function Hide-Console
     [Console.Window]::ShowWindow($consolePtr, 0)
 }
 
-Hide-Console
+#Hide-Console
 
 $form.Topmost = $false
 

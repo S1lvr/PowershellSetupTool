@@ -22,6 +22,8 @@ If ($script:currentversion -lt $script:newversion){
     Remove-Item -LiteralPath ".\PowershellSetupTool-main" -Force -Recurse
     Remove-Item -Path .\newversion.zip -force
     Write-Host "Cleaning Up..."
+} else {
+    Write-Host "You are already running the newest version."
 }
 
 Remove-Item .\version.ini
