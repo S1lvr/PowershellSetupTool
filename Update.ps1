@@ -17,8 +17,11 @@ If ($script:currentversion -lt $script:newversion){
     $download = "https://github.com/S1lvr/PowershellSetupTool/archive/refs/heads/main.zip"
     Invoke-WebRequest $download -outfile .\newversion.zip
     Write-Host "Script downloaded..."
+    Unblock-File -path .\newversion.zip
     Expand-Archive -path .\newversion.zip -DestinationPath .\ -Force
     Write-Host "Extracting Zip..."
+    Get-ChildItem .\*.ps1 -Recurse | Unblock-File
+    Write-Host "Trying to ensure powershell scripts downloaded work..."
     Copy-Item -Path .\PowershellSetupTool-main\*.* -Destination .\ -Recurse -Force
     Write-Host "Replacing Files..."
     Remove-Item -LiteralPath ".\PowershellSetupTool-main" -Force -Recurse
