@@ -61,6 +61,7 @@ $clientarray = @(
 	"CB Mattson"
 	"Maine Center for Dental Medicine"
 	"Granite Corp"
+	"Hawks Nest Lodge"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -84,6 +85,20 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Hawks_Nest_Lodge {
+	Set-NewPCName
+	Install-Atera 40
+	Install-Webroot 532B-ATRA-B237-320F-41B6
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "HNworkstation!"
+	Set-AzureADAccount
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Granite_Corp
 {
 	Set-NewPCName
