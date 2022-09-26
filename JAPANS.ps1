@@ -34,7 +34,8 @@ $myname = $MyInvocation.MyCommand.Name
 $pos = $workfolder.IndexOf($myname)
 $working = $workfolder.Substring(0, $pos)
 Set-Location $working
-Import-Module -name .\InstallData\SFTA.ps1
+unblock-file -path .\InstallData\SFTA.ps1
+import-module .\InstallData\SFTA.ps1 -disablenamechecking -scope local
 # --------------------------------------------------------------------------------------------------
 #░█████╗░██╗░░░░░██╗███████╗███╗░░██╗████████╗░██████╗
 #██╔══██╗██║░░░░░██║██╔════╝████╗░██║╚══██╔══╝██╔════╝
@@ -551,15 +552,26 @@ function Get-Custom
 #Default Apps Settings
 function Set-DefaultMail { # Thank you Mr. Random Czech Microsoft Dev for making this easy.
     Set-InstallStartupDirectory
-    Start-Process SetUserFTA.exe -Wait -ArgumentList "mailto Outlook.URL.mailto.15"
-	# Set-FTA Outlook.URL.mailto.15 mailto # This is for integration of the SFTA.ps1 script
+    #Start-Process SetUserFTA.exe -Wait -ArgumentList "mailto Outlook.URL.mailto.15"
+	Set-FTA Outlook.URL.mailto.15 mailto
+	# * Set-FTA Outlook.URL.mailto.15 mailto # This is for integration of the SFTA.ps1 script
 	#If you want to use this for other things, you have to "SetUserFTA.exe get" first.
 	#Grab the info you need from the associations, then use that.
 }
 function Set-DefaultPDF {
     Set-InstallStartupDirectory
-    Start-Process SetUserFTA.exe -Wait -ArgumentList ".pdf AcroExch.Document.DC"
-	# Set-FTA AcroExch.Document.DC .pdf
+    # * Start-Process SetUserFTA.exe -Wait -ArgumentList ".pdf AcroExch.Document.DC"
+	Set-FTA AcroExch.Document.DC .pdf
+}
+function Set-ChromeDefault
+{
+	# * Set-InstallStartupDirectory
+	# * Start-Process SetDefaultBrowser.exe -Wait -ArgumentList "chrome"
+	Set-FTA ChromeHTML http
+	Set-FTA ChromeHTML https
+	Set-FTA ChromeHTML .html
+	Set-FTA ChromeHTML .htm
+	Add-OutputBoxLine -Message "Chrome has been set as Default Web Browser."
 }
 #Windows 10 Pin Removal
 function Invoke-Win10PinRemoval #this was already a powershell script. Ctrl + C and Ctrl + V my guy.
@@ -581,6 +593,19 @@ function Invoke-Win10PinRemoval #this was already a powershell script. Ctrl + C 
 		Remove-Item -path $passportFolder -recurse -force
 	}
 	Add-OutputBoxLine "Ran Windows 10 Pin Removal Script."
+}
+function Get-SetupSteps {
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory = $true,
+					Position = 0)]
+		[string]
+		$functionname
+	)
+	Get-Content $me
+	$thefunction = Splitfrom("$functionname {").Splitfrom('}')
+	$i = 0
+	foreach ($element in $thefunction) {$i++}
 }
 function Perform-SetupStep
 {
@@ -647,12 +672,6 @@ function Set-TSMPassword
 	$tsmpass = ConvertTo-SecureString $password -AsPlainText -Force
 	$UserAccount = Get-LocalUser -Name "TSMAdmin"
 	$UserAccount | Set-LocalUser -Password $tsmpass
-}
-function Set-ChromeDefault
-{
-	Set-InstallStartupDirectory
-	Start-Process SetDefaultBrowser.exe -Wait -ArgumentList "chrome"
-	Add-OutputBoxLine -Message "Chrome has been set as Default Web Browser."
 }
 function Get-TempFolder {
 	$Folder = "C:\Temp"
