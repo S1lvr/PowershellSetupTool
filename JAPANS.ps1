@@ -85,6 +85,20 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Maine_Coalition_to_End_Domestic_Violence {
+	Set-NewPCName
+	Install-Atera 84
+	Install-Webroot C327-ATRA-F230-F57B-4204
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "MCEDVworkstation!"
+	Set-AzureADAccount
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Hawks_Nest_Lodge {
 	Set-NewPCName
 	Install-Atera 40
