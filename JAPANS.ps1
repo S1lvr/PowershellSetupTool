@@ -63,6 +63,7 @@ $clientarray = @(
 	"Maine Center for Dental Medicine"
 	"Granite Corp"
 	"Hawks Nest Lodge"
+	"Hometown Heat Pumps"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -72,8 +73,8 @@ $clientarray = @(
 # Completely Commented.
 #-----------
 #Todo: Finish Custom Client UI ( Domain Settings )
-#Todo: See if change in startup items script work.
-#Todo: Incorporate Start-Job so the loading bar doesn't freeze. / Partially Done
+#Todo: See if change in startup items script work. / It doesn't
+#Todo: Incorporate Start-Job so the loading bar doesn't freeze. / In Testing
 #Todo: Try installing PSWindowsUpdate and have it grab as many updates as it can at the start of the setup so the PC can be restarted at the end.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
@@ -86,7 +87,22 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Hometown_Heat_Pumps {
+	Invoke-SetupStep Set-NewPCName
+	Invoke-SetupStep "Install-Atera 28"
+	Invoke-SetupStep "Install-Webroot C88B-ATRA-9B3C-BAA8-4772"
+	Invoke-SetupStep Install-GChrome
+	Invoke-SetupStep Set-ChromeDefault
+	Invoke-SetupStep Install-Reader
+	Invoke-SetupStep Get-PowerSettingChanges
+	Invoke-SetupStep 'Set-TSMPassword "HHPworkstation!"'
+	Invoke-SetupStep Set-AzureADAccount
+	Invoke-SetupStep Install-OfficeInstaller
+	Invoke-SetupStep 'Add-OutputBoxLine "Setup Completed."'
+	Resolve-ProgressBar
+}
 function Get-Maine_Coalition_to_End_Domestic_Violence {
+	#Invoke-SetupStep Set-NewPCName
 	Set-NewPCName
 	Install-Atera 84
 	Install-Webroot C327-ATRA-F230-F57B-4204
@@ -594,7 +610,11 @@ function Invoke-Win10PinRemoval #this was already a powershell script. Ctrl + C 
 	}
 	Add-OutputBoxLine "Ran Windows 10 Pin Removal Script."
 }
-function Get-SetupSteps {
+#--------------------------
+#█▀█ █▀█ █▀█ █▀▀ █▀█ █▀▀ █▀ █▀   █▄▄ ▄▀█ █▀█
+#█▀▀ █▀▄ █▄█ █▄█ █▀▄ ██▄ ▄█ ▄█   █▄█ █▀█ █▀▄
+#--------------------------
+function Get-SetupSteps { #This will once i make it work grab the script (itself) and then find the # of lines in the function requested, as to make the progress bar work.
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory = $true,
@@ -606,8 +626,9 @@ function Get-SetupSteps {
 	$thefunction = Splitfrom("$functionname {").Splitfrom('}')
 	$i = 0
 	foreach ($element in $thefunction) {$i++}
+	$progressbar1.maximum = $i
 }
-function Perform-SetupStep
+function Invoke-SetupStep
 {
 	[CmdletBinding()]
 	param (
