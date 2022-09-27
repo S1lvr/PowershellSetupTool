@@ -74,7 +74,6 @@ $clientarray = @(
 #-----------
 #Todo: Finish Custom Client UI ( Domain Settings )
 #Todo: See if change in startup items script work. / It doesn't
-#Todo: Incorporate Start-Job so the loading bar doesn't freeze. / In Testing
 #Todo: Try installing PSWindowsUpdate and have it grab as many updates as it can at the start of the setup so the PC can be restarted at the end.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
@@ -88,17 +87,17 @@ $clientarray = @(
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
 function Get-Hometown_Heat_Pumps {
-	Invoke-SetupStep Set-NewPCName
-	Invoke-SetupStep "Install-Atera 28"
-	Invoke-SetupStep "Install-Webroot C88B-ATRA-9B3C-BAA8-4772"
-	Invoke-SetupStep Install-GChrome
-	Invoke-SetupStep Set-ChromeDefault
-	Invoke-SetupStep Install-Reader
-	Invoke-SetupStep Get-PowerSettingChanges
-	Invoke-SetupStep 'Set-TSMPassword "HHPworkstation!"'
-	Invoke-SetupStep Set-AzureADAccount
-	Invoke-SetupStep Install-OfficeInstaller
-	Invoke-SetupStep 'Add-OutputBoxLine "Setup Completed."'
+	Set-NewPCName
+	Install-Atera 28
+	Install-Webroot C88B-ATRA-9B3C-BAA8-4772
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "HHPworkstation!"
+	Set-AzureADAccount
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
 }
 function Get-Maine_Coalition_to_End_Domestic_Violence {
