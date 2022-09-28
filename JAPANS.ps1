@@ -754,6 +754,37 @@ function Set-StaticIP {
 	# Configure the DNS client server IP addresses
 	$adapter | Set-DnsClientServerAddress -ServerAddresses $DNS
 }
+#░█████╗░███████╗███████╗██╗░█████╗░███████╗  ███╗░░░███╗░█████╗░████████╗███████╗
+#██╔══██╗██╔════╝██╔════╝██║██╔══██╗██╔════╝  ████╗░████║██╔══██╗╚══██╔══╝██╔════╝
+#██║░░██║█████╗░░█████╗░░██║██║░░╚═╝█████╗░░  ██╔████╔██║███████║░░░██║░░░█████╗░░
+#██║░░██║██╔══╝░░██╔══╝░░██║██║░░██╗██╔══╝░░  ██║╚██╔╝██║██╔══██║░░░██║░░░██╔══╝░░
+#╚█████╔╝██║░░░░░██║░░░░░██║╚█████╔╝███████╗  ██║░╚═╝░██║██║░░██║░░░██║░░░███████╗
+#░╚════╝░╚═╝░░░░░╚═╝░░░░░╚═╝░╚════╝░╚══════╝  ╚═╝░░░░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚══════╝
+function Install-OfficeMate {
+	$PreInstall = "https://officemate-prod.s3.amazonaws.com/AutoUpdate/omsuite/release/downloads/VB2NetServerSuiteInstallers/OM.PreInstallCheck.Installer.exe"
+	Get-TempFolder
+	Invoke-WebRequest -Uri $PreInstall -Outfile C:\Temp\PreInstaller.exe
+	[System.Windows.MessageBox]::Show('Ok so this will install and run the Pre Installer, you have to go their site to download actual Office Mate, which this script will open for you, as well as give you instructions in a text file.')
+	Start-Process PreInstaller.exe -wait
+	Add-OutputBoxLine "Mapping O Drive for Officemate..."
+	New-PSDrive -Name "O" -PSProvider FileSystem -Root "\\kec-server\DATA" -Persist
+	$instructions = @(
+		"Ok so the officemate page is going to open."
+		"You have to:"
+		"- Scroll down to the contact section"
+		"- Input a name and email"
+		"The Phone of the Practice, 207-872-2797"
+		"The Name: Kennebec Eye Care"
+		"Check that you run the preinstall checker"
+		'Select "No" for MIPS'
+		"Submit, then select OfficeMate Suite"
+		"Run the installer as admin,"
+		"And point it to the O: drive for data."
+	)
+	echo $instructions > instructions.text
+	Start-Process notepad.exe -ArgumentList "C:\Temp\instructions.txt"
+	Start-Process "http://www.eyefinity.com/practice-management/officemate/om15.html"
+}
 #░██████╗████████╗░█████╗░██████╗░████████╗██╗░░░██╗██████╗░  ██╗████████╗███████╗███╗░░░███╗░██████╗
 #██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██║░░░██║██╔══██╗  ██║╚══██╔══╝██╔════╝████╗░████║██╔════╝
 #╚█████╗░░░░██║░░░███████║██████╔╝░░░██║░░░██║░░░██║██████╔╝  ██║░░░██║░░░█████╗░░██╔████╔██║╚█████╗░
@@ -1067,7 +1098,7 @@ function Install-EagleSoft {
 	Set-Location $EaglesoftLocation
 	Add-OutputBoxLine "YOU WILL NEED THE EAGLESOFT LICENSE KEY!"
 	Add-OutputBoxLine "THIS IS IN ITPORTAL."
-	Start-Process essetup.exe -verb runas
+	Start-Process essetup.exe -verb runas -wait
 }
 #░█████╗░██████╗░██╗░░██╗
 #██╔══██╗██╔══██╗██║░██╔╝
