@@ -97,6 +97,7 @@ function Get-Kennebec_Eye_Care {
 	Get-PowerSettingChanges
 	Set-TSMPassword "KECworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.0.5" -DomainServer "kennebeceye.local"
+	Install-OfficeMate
 	Install-OfficeInstaller
 	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
