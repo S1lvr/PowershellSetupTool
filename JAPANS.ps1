@@ -36,6 +36,19 @@ $working = $workfolder.Substring(0, $pos)
 Set-Location $working
 unblock-file -path .\InstallData\SFTA.ps1
 import-module .\InstallData\SFTA.ps1 -disablenamechecking -scope local
+if ($null -eq `
+	(Get-InstalledModule `
+    -Name "AzureRm.Profile" `
+    -ErrorAction SilentlyContinue)) {
+		Write-Host "Installing PSWindows Update..."
+		Install-Module -Name PSWindowsUpdate -Force
+		Write-Host "Starting Windows Update in Background..."
+		Start-Sleep 1
+		Start-Job -Name "WUpdate" -ScriptBlock {Get-WindowsUpdate -AcceptAll Install}
+} else {
+	Write-Host "Starting Windows Update in Background..."
+	Start-Job -Name "WUpdate" -ScriptBlock {Get-WindowsUpdate -AcceptAll Install}
+}
 # --------------------------------------------------------------------------------------------------
 #░█████╗░██╗░░░░░██╗███████╗███╗░░██╗████████╗░██████╗
 #██╔══██╗██║░░░░░██║██╔════╝████╗░██║╚══██╔══╝██╔════╝
