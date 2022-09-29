@@ -1435,7 +1435,7 @@ $okbutton.Add_Click({
 	$progressbar1.size = New-Object System.Drawing.Size(175, 23)
 	$Tab1.controls.Add($progressbar1)
 	$script:isinstallrunning = $true
-	Set-TimeZone -Id "America\New_York"
+	Set-TimeZone -Id "Eastern Standard Time"
 	Invoke-Expression $run
 }) # Prepends the chosen option with "Get-" so it works as a function name
 $okbutton.Cursor = [System.Windows.Forms.Cursors]::Hand
