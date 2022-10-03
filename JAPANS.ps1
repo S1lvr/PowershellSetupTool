@@ -78,6 +78,7 @@ $clientarray = @(
 	"Hawks Nest Lodge"
 	"Hometown Heat Pumps"
 	"Kennebec Eye Care"
+	"Maine Coalition to End Domestic Violence"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
