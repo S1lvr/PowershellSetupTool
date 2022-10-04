@@ -767,7 +767,7 @@ function Set-StaticIP {
 	$Dns = "1.1.1.1"
 	$IPType = "IPv4"
 	# Retrieve the network adapter that you want to configure
-	$adapter = Get-NetAdapter | ? {$_.Status -eq "up"}
+	$adapter = Get-NetAdapter | Where-Object {$_.Status -eq "up"}
 	# Remove any existing IP, gateway from our ipv4 adapter
 	If (($adapter | Get-NetIPConfiguration).IPv4Address.IPAddress) {
  		$adapter | Remove-NetIPAddress -AddressFamily $IPType -Confirm:$false
@@ -811,7 +811,7 @@ function Install-OfficeMate {
 		"Run the installer as admin,"
 		"And point it to the O: drive for data."
 	)
-	echo $instructions > instructions.text
+	Write-Output $instructions > instructions.text
 	Start-Process notepad.exe -ArgumentList "C:\Temp\instructions.txt"
 	Start-Process "http://www.eyefinity.com/practice-management/officemate/om15.html"
 }
@@ -1264,7 +1264,7 @@ function Install-Epicor
 		function popUp($text, $title)
 		{
 			$a = new-object -comobject wscript.shell
-			$b = $a.popup($text, 0, $title, 0)
+			_$b = $a.popup($text, 0, $title, 0)
 		}
 		popUp "Epicor tried to install with unrecognised client" "Error"
 	}
