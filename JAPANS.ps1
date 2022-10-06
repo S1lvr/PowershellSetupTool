@@ -1231,17 +1231,16 @@ function Get-SerialStatus {
 	$script:thejson = "https://app.atera.com/api/v3/agents/customer/$API" #Set our Atera JSON Link
 	$AteraAPI = Invoke-RestMethod -Uri $thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET #Grab Atera JSON for X customer
 	While($AteraAPI.page -le $AteraAPI.totalPages) {
-    	$AteraAPI = Invoke-RestMethod -Uri $script:thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
+    	$script:AteraAPI = Invoke-RestMethod -Uri $script:thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
   		$SerialKeyHash = $AteraAPI.items | Select-Object 'VendorSerialNumber' #Grab the table for Serial Keys as a Hash Table
   		[string[]] $AteraSK = ($SerialKeyHash | Out-String -Stream) -ne '' | SELECT -Skip 2 #Convert Hash Table to Array
   		foreach ($element in $AteraSK) { #Sift through each entry in the array
-			$wow = 
 	    	if ($element.Contains($RealCurPC)) {
 				Write-Warning "Device exists in Atera."
 				$Script:DeviceExists = $true
     		}
 			if ($true -eq $deviceexists) {
-				#return $true
+				return $true
 			}
   		}
 		$page = [int]$AteraAPI.page
@@ -1258,7 +1257,6 @@ function Get-SerialStatus {
 	    Write-Host "Grabbing Next Page of Devices..."
 	    $script:thejson = $AteraAPI.nextLink
 	  	}
-  		$script:ranonce = $true
 	}
 }
 #░█████╗░████████╗███████╗██████╗░░█████╗░
