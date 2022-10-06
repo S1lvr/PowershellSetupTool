@@ -816,70 +816,6 @@ function Install-OfficeMate {
 	Start-Process notepad.exe -ArgumentList "C:\Temp\instructions.txt"
 	Start-Process "http://www.eyefinity.com/practice-management/officemate/om15.html"
 }
-<# Here is the "atera check" system
-#░█████╗░████████╗███████╗██████╗░░█████╗░  ░█████╗░██╗░░██╗███████╗░█████╗░██╗░░██╗░░░
-#██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔══██╗  ██╔══██╗██║░░██║██╔════╝██╔══██╗██║░██╔╝░░░
-#███████║░░░██║░░░█████╗░░██████╔╝███████║  ██║░░╚═╝███████║█████╗░░██║░░╚═╝█████═╝░░░░
-#██╔══██║░░░██║░░░██╔══╝░░██╔══██╗██╔══██║  ██║░░██╗██╔══██║██╔══╝░░██║░░██╗██╔═██╗░░░░
-#██║░░██║░░░██║░░░███████╗██║░░██║██║░░██║  ╚█████╔╝██║░░██║███████╗╚█████╔╝██║░╚██╗██╗
-#╚═╝░░╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝  ░╚════╝░╚═╝░░╚═╝╚══════╝░╚════╝░╚═╝░░╚═╝╚═╝
-#>
-function Get-AteraCheck {
-	[CmdletBinding()]
-	param (
-		[Parameter()]
-		[String]
-		$Client
-	)
-	$isit = Get-SerialStatus $Client
-	if ($true -eq $isit) {
-		$serial = Get-WMIObject win32_bios | Select-Object serialnumber
-		[string[]] $serialkey = ($serial | Out-String -Stream) -ne '' | SELECT -Skip 2 #For some reason this is also a hash table so you know the drill.
-		[System.Windows.MessageBox]::Show("This PC already exists in Atera, please remove it before continuing, search $serialkey")
-	}
-}
-function Get-SerialStatus {
-	Param 
-	(
-		[Parameter(Mandatory = $true,
-				   Position = 0)]
-		[string]$API
-	)
-	$CurPC = Get-WMIObject win32_bios | Select-Object serialnumber #Grab Current Serial #
-	[string[]] $RealCurPC = ($CurPC | Out-String -Stream) -ne '' | SELECT -Skip 2 #For some reason this is also a hash table so you know the drill.
-	$script:thejson = "https://app.atera.com/api/v3/agents/customer/$API" #Set our Atera JSON Link
-	$AteraAPI = Invoke-RestMethod -Uri $thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET #Grab Atera JSON for X customer
-	While($AteraAPI.page -le $AteraAPI.totalPages) {
- 		if ($ranonce -eq $true) {
-    		$script:AteraAPI = Invoke-RestMethod -Uri $script:thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
-  		}
-  		$SerialKeyHash = $AteraAPI.items | Select-Object 'VendorSerialNumber' #Grab the table for Serial Keys as a Hash Table
-  		[string[]] $AteraSK = ($SerialKeyHash | Out-String -Stream) -ne '' | SELECT -Skip 2 #Convert Hash Table to Array
-  		$who = -1
-  		foreach ($element in $AteraSK) { #Sift through each entry in the array
-	    	$script:who += 1
-	    	if ($element.Contains($RealCurPC)) {
-	      		#ERR: DEVICE ALREADY IN ATERA
-				Write-Warning "Device exists in Atera."
-				$Script:DeviceExists = $true
-    		}
-			if ($true -eq $deviceexists) {
-				return $true
-			}
-  		}
-  		if ($AteraAPI.page -eq $AteraAPI.totalPages) {
-		    Write-Host "End of Devices."
-	    	Return
-  		} elseif ($null -eq $AteraAPI.nextLink) {
-			Write-Host "End of Devices."
-			Return
-		} else {
-	    Write-Host "Grabbing Next Page of Devices..."
-	    $script:thejson = $AteraAPI.nextLink
-	  	}
-  	$script:ranonce = $true
-	}
-}
 #░██████╗████████╗░█████╗░██████╗░████████╗██╗░░░██╗██████╗░  ██╗████████╗███████╗███╗░░░███╗░██████╗
 #██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██║░░░██║██╔══██╗  ██║╚══██╔══╝██╔════╝████╗░████║██╔════╝
 #╚█████╗░░░░██║░░░███████║██████╔╝░░░██║░░░██║░░░██║██████╔╝  ██║░░░██║░░░█████╗░░██╔████╔██║╚█████╗░
@@ -1260,6 +1196,70 @@ function Install-Webroot
 	
 	# echo msiexec /i wsasme.msi GUILIC=$key CMDLINE=SME,quiet /qn /l*v install.log
 	# echo Install Webroot with Key $key
+}
+<# Here is the "atera check" system
+#░█████╗░████████╗███████╗██████╗░░█████╗░  ░█████╗░██╗░░██╗███████╗░█████╗░██╗░░██╗░░░
+#██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔══██╗  ██╔══██╗██║░░██║██╔════╝██╔══██╗██║░██╔╝░░░
+#███████║░░░██║░░░█████╗░░██████╔╝███████║  ██║░░╚═╝███████║█████╗░░██║░░╚═╝█████═╝░░░░
+#██╔══██║░░░██║░░░██╔══╝░░██╔══██╗██╔══██║  ██║░░██╗██╔══██║██╔══╝░░██║░░██╗██╔═██╗░░░░
+#██║░░██║░░░██║░░░███████╗██║░░██║██║░░██║  ╚█████╔╝██║░░██║███████╗╚█████╔╝██║░╚██╗██╗
+#╚═╝░░╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝  ░╚════╝░╚═╝░░╚═╝╚══════╝░╚════╝░╚═╝░░╚═╝╚═╝
+#>
+function Get-AteraCheck {
+	[CmdletBinding()]
+	param (
+		[Parameter()]
+		[String]
+		$Client
+	)
+	$isit = Get-SerialStatus $Client
+	if ($true -eq $isit) {
+		$serial = Get-WMIObject win32_bios | Select-Object serialnumber
+		[string[]] $serialkey = ($serial | Out-String -Stream) -ne '' | SELECT -Skip 2 #For some reason this is also a hash table so you know the drill.
+		[System.Windows.MessageBox]::Show("This PC already exists in Atera, please remove it before continuing, search $serialkey")
+	}
+}
+function Get-SerialStatus {
+	Param 
+	(
+		[Parameter(Mandatory = $true,
+				   Position = 0)]
+		[string]$API
+	)
+	$CurPC = Get-WMIObject win32_bios | Select-Object serialnumber #Grab Current Serial #
+	[string[]] $RealCurPC = ($CurPC | Out-String -Stream) -ne '' | SELECT -Skip 2 #For some reason this is also a hash table so you know the drill.
+	$script:thejson = "https://app.atera.com/api/v3/agents/customer/$API" #Set our Atera JSON Link
+	$AteraAPI = Invoke-RestMethod -Uri $thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET #Grab Atera JSON for X customer
+	While($AteraAPI.page -le $AteraAPI.totalPages) {
+ 		if ($ranonce -eq $true) {
+    		$script:AteraAPI = Invoke-RestMethod -Uri $script:thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
+  		}
+  		$SerialKeyHash = $AteraAPI.items | Select-Object 'VendorSerialNumber' #Grab the table for Serial Keys as a Hash Table
+  		[string[]] $AteraSK = ($SerialKeyHash | Out-String -Stream) -ne '' | SELECT -Skip 2 #Convert Hash Table to Array
+  		$who = -1
+  		foreach ($element in $AteraSK) { #Sift through each entry in the array
+	    	$script:who += 1
+	    	if ($element.Contains($RealCurPC)) {
+	      		#ERR: DEVICE ALREADY IN ATERA
+				Write-Warning "Device exists in Atera."
+				$Script:DeviceExists = $true
+    		}
+			if ($true -eq $deviceexists) {
+				return $true
+			}
+  		}
+  		if ($AteraAPI.page -eq $AteraAPI.totalPages) {
+		    Write-Host "End of Devices."
+	    	Return
+  		} elseif ($null -eq $AteraAPI.nextLink) {
+			Write-Host "End of Devices."
+			Return
+		} else {
+	    Write-Host "Grabbing Next Page of Devices..."
+	    $script:thejson = $AteraAPI.nextLink
+	  	}
+  	$script:ranonce = $true
+	}
 }
 #░█████╗░████████╗███████╗██████╗░░█████╗░
 #██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔══██╗
