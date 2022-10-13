@@ -741,15 +741,12 @@ function Set-TSMPassword
 }
 function Get-TempFolder {
 	$Folder = "C:\Temp"
-	if (Test-Path -Path $Folder)
-	{
-		Set-Location "C:\Temp"
-	}
-	else
+	if (-not (Test-Path -Path $Folder))
 	{
 		New-Item "C:\Temp" -Type Directory
-		Set-Location "C:\Temp"
-	} #make a folder to work out of, if it doesn't exist
+	}
+	Set-Location "C:\Temp"
+	#make a folder to work out of, if it doesn't exist
 }
 function Set-StaticIP {
 	param
@@ -1359,7 +1356,7 @@ function Get-PowerSettingChanges
 	Add-OutputBoxLine "Changing Power Settings Via Batch Script..."
 	powershell -command "Start-Process PowerSettings.bat -Verb runas"
 }
-#██╗░░██╗███████╗████████╗  ███████╗██╗░░██╗████████╗███████╗███╗░░██╗██████╗░███████╗██████╗░
+#███╗░░██╗███████╗████████╗  ███████╗██╗░░██╗████████╗███████╗███╗░░██╗██████╗░███████╗██████╗░
 #████╗░██║██╔════╝╚══██╔══╝  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝████╗░██║██╔══██╗██╔════╝██╔══██╗
 #██╔██╗██║█████╗░░░░░██║░░░  █████╗░░░╚███╔╝░░░░██║░░░█████╗░░██╔██╗██║██║░░██║█████╗░░██████╔╝
 #██║╚████║██╔══╝░░░░░██║░░░  ██╔══╝░░░██╔██╗░░░░██║░░░██╔══╝░░██║╚████║██║░░██║██╔══╝░░██╔══██╗
