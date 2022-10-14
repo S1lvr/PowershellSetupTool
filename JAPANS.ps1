@@ -112,6 +112,7 @@ function Get-Carey_Land_Surveys {
 	Install-Reader
 	Get-PowerSettingChanges
 	Set-TSMPassword "CLSworkstation!"
+	#Set-TSMPassword $TSMPass
 	#Set-AzureADAccount
 	Install-OfficeInstaller
 	Add-OutputBoxLine "Setup Completed."
@@ -725,8 +726,9 @@ function Set-TSMPassword
 	param
 	(
 		[parameter(Mandatory = $true, Position = 0)]
-		[String]$password 
+		[String]$thepass
 	)
+	$tsmpass = $thepass | ConvertTo-SecureString -AsPlainText -Force
 	$TSMUser = Get-LocalUser -Name "TSMAdmin"
 	if ($null -eq $TSMUser) {
 		Add-OutputBoxLine "TSMAdmin account not found, creating..."
@@ -735,7 +737,6 @@ function Set-TSMPassword
 		Add-OutputBoxLine "TSMAdmin account found,"
 	}
 	Add-OutputBoxLine "Setting TSMAdmin Password..."
-	$tsmpass = ConvertTo-SecureString $password -AsPlainText -Force
 	$UserAccount = Get-LocalUser -Name "TSMAdmin"
 	$UserAccount | Set-LocalUser -Password $tsmpass
 }
@@ -1212,7 +1213,7 @@ function Get-AteraCheck {
 	$isit = Get-SerialStatus $Client
 	if ($true -eq $isit) {
 		$serial = Get-WMIObject win32_bios | Select-Object serialnumber
-		[string[]] $serialkey = ($serial | Out-String -Stream) -ne '' | SELECT -Skip 2 #For some reason this is also a hash table so you know the drill.
+		[string[]] $serialkey = ($serial | Out-String -Stream) -ne '' | Select-Object -Skip 2 #For some reason this is also a hash table so you know the drill.
 		[System.Windows.MessageBox]::Show("This PC already exists in Atera, please remove it before continuing, search $serialkey")
 	}
 }
@@ -1224,13 +1225,13 @@ function Get-SerialStatus {
 		[string]$API
 	)
 	$CurPC = Get-WMIObject win32_bios | Select-Object serialnumber #Grab Current Serial #
-	[string[]] $RealCurPC = ($CurPC | Out-String -Stream) -ne '' | SELECT -Skip 2 #For some reason this is also a hash table so you know the drill.
+	[string[]] $RealCurPC = ($CurPC | Out-String -Stream) -ne '' | Select-Object -Skip 2 #For some reason this is also a hash table so you know the drill.
 	$script:thejson = "https://app.atera.com/api/v3/agents/customer/$API" #Set our Atera JSON Link
 	$AteraAPI = Invoke-RestMethod -Uri $thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET #Grab Atera JSON for X customer
 	While($AteraAPI.page -le $AteraAPI.totalPages) {
     	$script:AteraAPI = Invoke-RestMethod -Uri $script:thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
   		$SerialKeyHash = $AteraAPI.items | Select-Object 'VendorSerialNumber' #Grab the table for Serial Keys as a Hash Table
-  		[string[]] $AteraSK = ($SerialKeyHash | Out-String -Stream) -ne '' | SELECT -Skip 2 #Convert Hash Table to Array
+  		[string[]] $AteraSK = ($SerialKeyHash | Out-String -Stream) -ne '' | Select-Object -Skip 2 #Convert Hash Table to Array
   		foreach ($element in $AteraSK) { #Sift through each entry in the array
 	    	if ($element.Contains($RealCurPC)) {
 				Write-Warning "Device exists in Atera."
@@ -1437,16 +1438,12 @@ function Install-Reader
 #██║░░██║███████╗██║░╚███║██║░░██║██║░╚═╝░██║███████╗
 #╚═╝░░╚═╝╚══════╝╚═╝░░╚══╝╚═╝░░╚═╝╚═╝░░░░░╚═╝╚══════╝
 function Set-NewPCName
-{
-	[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
-	
+{	
 	$title = 'New PC Name'
 	$msg = 'Enter new PC Name:'
-	
 	$text = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
 	Rename-Computer -NewName $text
-	$nameoutput = -join ("Renamed PC to ", $text, ", please restart to finalize change.")
-	Add-OutputBoxLine $nameoutput
+	Add-OutputBoxLine "Renamed PC to $text, please restart to finalize change."
 	Add-OutputBoxLine "Be aware once Atera installs splashtop will have the old name."
 	Add-OutputBoxLine "Please launch splashtop as admin and change the PC name to the correct name."
 }
@@ -1470,6 +1467,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName PresentationFramework
 [System.Windows.Forms.Application]::EnableVisualStyles()
+[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
 
 #Create Main Window
 $form = New-Object System.Windows.Forms.Form
