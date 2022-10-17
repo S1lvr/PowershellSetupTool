@@ -755,6 +755,13 @@ function Set-TSMPassword
 	$UserAccount = Get-LocalUser -Name "TSMAdmin"
 	$UserAccount | Set-LocalUser -Password $tsmpass
 }
+function Get-TemperFolder {
+    $Folder = "C:\Temp"
+    if(-not (Test-Path -Path $Folder) {
+        New-Item "C:\Temp" -Type Directory
+    }
+    Set-Location "C:\Temp"
+}
 function Get-TempFolder {
 	$Folder = "C:\Temp"
 	if (-not (Test-Path -Path $Folder))
