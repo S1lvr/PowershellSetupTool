@@ -36,6 +36,7 @@ $working = $workfolder.Substring(0, $pos)
 Set-Location $working
 unblock-file -path .\InstallData\SFTA.ps1
 import-module .\InstallData\SFTA.ps1 -disablenamechecking -scope local
+#Install PSWindows Update and start grabbing updates
 if ($null -eq `
 	(Get-InstalledModule `
     -Name "AzureRm.Profile" `
@@ -79,6 +80,7 @@ $clientarray = @(
 	"Hometown Heat Pumps"
 	"Kennebec Eye Care"
 	"Maine Coalition to End Domestic Violence"
+	"Carey Land Surveys"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -101,6 +103,21 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Carey_Land_Surveys {
+	Set-NewPCName
+	Install-Atera 95
+	Install-Webroot A008-ATRA-508A-310F-41FA
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "CLSworkstation!"
+	#Set-TSMPassword $TSMPass
+	#Set-AzureADAccount
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Kennebec_Eye_Care {
 	Set-NewPCName
 	Install-Atera 37
@@ -709,8 +726,9 @@ function Set-TSMPassword
 	param
 	(
 		[parameter(Mandatory = $true, Position = 0)]
-		[String]$password 
+		[String]$thepass
 	)
+	$tsmpass = $thepass | ConvertTo-SecureString -AsPlainText -Force
 	$TSMUser = Get-LocalUser -Name "TSMAdmin"
 	if ($null -eq $TSMUser) {
 		Add-OutputBoxLine "TSMAdmin account not found, creating..."
@@ -719,7 +737,6 @@ function Set-TSMPassword
 		Add-OutputBoxLine "TSMAdmin account found,"
 	}
 	Add-OutputBoxLine "Setting TSMAdmin Password..."
-	$tsmpass = ConvertTo-SecureString $password -AsPlainText -Force
 	$UserAccount = Get-LocalUser -Name "TSMAdmin"
 	$UserAccount | Set-LocalUser -Password $tsmpass
 }
@@ -732,15 +749,12 @@ function Get-TemperFolder {
 }
 function Get-TempFolder {
 	$Folder = "C:\Temp"
-	if (Test-Path -Path $Folder)
-	{
-		Set-Location "C:\Temp"
-	}
-	else
+	if (-not (Test-Path -Path $Folder))
 	{
 		New-Item "C:\Temp" -Type Directory
-		Set-Location "C:\Temp"
-	} #make a folder to work out of, if it doesn't exist
+	}
+	Set-Location "C:\Temp"
+	#make a folder to work out of, if it doesn't exist
 }
 function Set-StaticIP {
 	param
@@ -759,7 +773,7 @@ function Set-StaticIP {
 	$Dns = "1.1.1.1"
 	$IPType = "IPv4"
 	# Retrieve the network adapter that you want to configure
-	$adapter = Get-NetAdapter | ? {$_.Status -eq "up"}
+	$adapter = Get-NetAdapter | Where-Object {$_.Status -eq "up"}
 	# Remove any existing IP, gateway from our ipv4 adapter
 	If (($adapter | Get-NetIPConfiguration).IPv4Address.IPAddress) {
  		$adapter | Remove-NetIPAddress -AddressFamily $IPType -Confirm:$false
@@ -803,7 +817,7 @@ function Install-OfficeMate {
 		"Run the installer as admin,"
 		"And point it to the O: drive for data."
 	)
-	echo $instructions > instructions.text
+	Write-Output $instructions > instructions.text
 	Start-Process notepad.exe -ArgumentList "C:\Temp\instructions.txt"
 	Start-Process "http://www.eyefinity.com/practice-management/officemate/om15.html"
 }
@@ -1188,6 +1202,81 @@ function Install-Webroot
 	# echo msiexec /i wsasme.msi GUILIC=$key CMDLINE=SME,quiet /qn /l*v install.log
 	# echo Install Webroot with Key $key
 }
+<# Here is the "atera check" system
+#░█████╗░████████╗███████╗██████╗░░█████╗░  ░█████╗░██╗░░██╗███████╗░█████╗░██╗░░██╗░░░
+#██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔══██╗  ██╔══██╗██║░░██║██╔════╝██╔══██╗██║░██╔╝░░░
+#███████║░░░██║░░░█████╗░░██████╔╝███████║  ██║░░╚═╝███████║█████╗░░██║░░╚═╝█████═╝░░░░
+#██╔══██║░░░██║░░░██╔══╝░░██╔══██╗██╔══██║  ██║░░██╗██╔══██║██╔══╝░░██║░░██╗██╔═██╗░░░░
+#██║░░██║░░░██║░░░███████╗██║░░██║██║░░██║  ╚█████╔╝██║░░██║███████╗╚█████╔╝██║░╚██╗██╗
+#╚═╝░░╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝  ░╚════╝░╚═╝░░╚═╝╚══════╝░╚════╝░╚═╝░░╚═╝╚═╝
+#>
+function Get-AteraCheck {
+	[CmdletBinding()]
+	param (
+		[Parameter()]
+		[String]
+		$Client
+	)
+	$isit = Get-SerialStatus $Client
+	if ($true -eq $isit) {
+		$serial = Get-WMIObject win32_bios | Select-Object serialnumber
+		[string[]] $serialkey = ($serial | Out-String -Stream) -ne '' | Select-Object -Skip 2 #For some reason this is also a hash table so you know the drill.
+		[System.Windows.MessageBox]::Show("This PC already exists in Atera, please remove it before continuing, search $serialkey")
+	} else {
+		Write-Host "Machine does not exist in Atera."
+	}
+}
+function Get-SerialStatus {
+	Param 
+	(
+		[Parameter(Mandatory = $true,
+				   Position = 0)]
+		[string]$API
+	)
+	$RealCurPC = "NO"
+	#$CurPC = Get-WMIObject win32_bios | Select-Object serialnumber #Grab Current Serial
+	#[string[]] $RealCurPC = ($CurPC | Out-String -Stream) -ne '' | Select-Object -Skip 2 #For some reason this is also a hash table so you know the drill.
+	$script:thejson = "https://app.atera.com/api/v3/agents/customer/$API" #Set our Atera JSON Link
+	$AteraAPI = Invoke-RestMethod -Uri $thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET #Grab Atera JSON for X customer
+	Write-Host "Setting Json"
+	While($AteraAPI.page -le $AteraAPI.totalPages) {
+		Write-Host "Loop Started"
+		Write-Host "Grabbing Json"
+    	$script:AteraAPI = Invoke-RestMethod -Uri $script:thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
+		Write-Host "Creating hash table"
+  		$SerialKeyHash = $AteraAPI.items | Select-Object 'VendorSerialNumber' #Grab the table for Serial Keys as a Hash Table
+		write-host "converting hash table"
+  		[string[]] $AteraSK = ($SerialKeyHash | Out-String -Stream) -ne '' | Select-Object -Skip 2 #Convert Hash Table to Array
+		write-host "starting for each loop"
+  		foreach ($element in $AteraSK) { #Sift through each entry in the array
+			write-host "looking at $element"
+			write-host $element
+			write-host $RealCurPC
+			$deviceexists = $false
+	    	if ($element -eq $RealCurPC) {
+				Write-Warning "Device exists in Atera."
+				$Script:DeviceExists = $true
+    		}
+			if ($true -eq $deviceexists) {
+				return $true
+			}
+  		}
+		$page = [int]$AteraAPI.page
+		Write-host "Reading page $page"
+		$totalpage = [int]$AteraAPI.totalpages
+		write-host "of $totalpage"
+  		if ($page -eq $totalpage) {
+		    Write-Host "End of Devices."
+	    	Return
+  		} elseif ($null -eq $AteraAPI.nextLink) {
+			Write-Host "End of Devices."
+			Return
+		} else {
+	    Write-Host "Grabbing Next Page of Devices..."
+	    $script:thejson = $AteraAPI.nextLink
+	  	}
+	}
+}
 #░█████╗░████████╗███████╗██████╗░░█████╗░
 #██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔══██╗
 #███████║░░░██║░░░█████╗░░██████╔╝███████║
@@ -1203,6 +1292,7 @@ function Install-Atera
 		[Parameter(Mandatory = $true, Position = 0)]
 		[object]$ClientID
 	)
+	Get-AteraCheck $ClientID
 	Add-OutputBoxLine "Creating Temp folder in C:\Temp"
 	Get-TempFolder
 	Add-OutputBoxLine "Downloading Atera Installer..."
@@ -1256,7 +1346,7 @@ function Install-Epicor
 		function popUp($text, $title)
 		{
 			$a = new-object -comobject wscript.shell
-			$b = $a.popup($text, 0, $title, 0)
+			_$b = $a.popup($text, 0, $title, 0)
 		}
 		popUp "Epicor tried to install with unrecognised client" "Error"
 	}
@@ -1287,7 +1377,7 @@ function Get-PowerSettingChanges
 	Add-OutputBoxLine "Changing Power Settings Via Batch Script..."
 	powershell -command "Start-Process PowerSettings.bat -Verb runas"
 }
-#██╗░░██╗███████╗████████╗  ███████╗██╗░░██╗████████╗███████╗███╗░░██╗██████╗░███████╗██████╗░
+#███╗░░██╗███████╗████████╗  ███████╗██╗░░██╗████████╗███████╗███╗░░██╗██████╗░███████╗██████╗░
 #████╗░██║██╔════╝╚══██╔══╝  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝████╗░██║██╔══██╗██╔════╝██╔══██╗
 #██╔██╗██║█████╗░░░░░██║░░░  █████╗░░░╚███╔╝░░░░██║░░░█████╗░░██╔██╗██║██║░░██║█████╗░░██████╔╝
 #██║╚████║██╔══╝░░░░░██║░░░  ██╔══╝░░░██╔██╗░░░░██║░░░██╔══╝░░██║╚████║██║░░██║██╔══╝░░██╔══██╗
@@ -1370,14 +1460,11 @@ function Install-Reader
 function Set-NewPCName
 {
 	[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
-	
 	$title = 'New PC Name'
 	$msg = 'Enter new PC Name:'
-	
 	$text = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
 	Rename-Computer -NewName $text
-	$nameoutput = -join ("Renamed PC to ", $text, ", please restart to finalize change.")
-	Add-OutputBoxLine $nameoutput
+	Add-OutputBoxLine "Renamed PC to $text, please restart to finalize change."
 	Add-OutputBoxLine "Be aware once Atera installs splashtop will have the old name."
 	Add-OutputBoxLine "Please launch splashtop as admin and change the PC name to the correct name."
 }
@@ -1401,6 +1488,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName PresentationFramework
 [System.Windows.Forms.Application]::EnableVisualStyles()
+[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
 
 #Create Main Window
 $form = New-Object System.Windows.Forms.Form
