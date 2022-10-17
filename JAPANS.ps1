@@ -81,6 +81,7 @@ $clientarray = @(
 	"Kennebec Eye Care"
 	"Maine Coalition to End Domestic Violence"
 	"Carey Land Surveys"
+	"Valley Beverage"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -103,6 +104,20 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Valley_Beverage {
+	Set-NewPCName
+	Install-Atera 58
+	Install-Webroot EA4A-ATRA-A9A6-8EDA-4FEF
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "VBworkstation!"
+	Set-DNSAndDomain -DNSServer "192.168.100.12" -DomainServer "valley.local"
+	Install-OfficeInstaller
+	Add-OutputBoxLine
+	Resolve-ProgressBar
+}
 function Get-Carey_Land_Surveys {
 	Set-NewPCName
 	Install-Atera 95
@@ -1226,16 +1241,15 @@ function Get-SerialStatus {
 				   Position = 0)]
 		[string]$API
 	)
-	$RealCurPC = "NO"
-	#$CurPC = Get-WMIObject win32_bios | Select-Object serialnumber #Grab Current Serial
-	#[string[]] $RealCurPC = ($CurPC | Out-String -Stream) -ne '' | Select-Object -Skip 2 #For some reason this is also a hash table so you know the drill.
+	$CurPC = Get-WMIObject win32_bios | Select-Object serialnumber #Grab Current Serial
+	[string[]] $RealCurPC = ($CurPC | Out-String -Stream) -ne '' | Select-Object -Skip 2 #For some reason this is also a hash table so you know the drill.
 	$script:thejson = "https://app.atera.com/api/v3/agents/customer/$API" #Set our Atera JSON Link
 	$AteraAPI = Invoke-RestMethod -Uri $thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET #Grab Atera JSON for X customer
 	Write-Host "Setting Json"
 	While($AteraAPI.page -le $AteraAPI.totalPages) {
 		Write-Host "Loop Started"
 		Write-Host "Grabbing Json"
-    	$script:AteraAPI = Invoke-RestMethod -Uri $script:thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
+    	$AteraAPI = Invoke-RestMethod -Uri $thejson -Headers @{'X-API-KEY' = '7d4f2a9bb8dd4bf8bd28bd59f3f2e0bd'} -Method GET
 		Write-Host "Creating hash table"
   		$SerialKeyHash = $AteraAPI.items | Select-Object 'VendorSerialNumber' #Grab the table for Serial Keys as a Hash Table
 		write-host "converting hash table"
@@ -1264,10 +1278,9 @@ function Get-SerialStatus {
   		} elseif ($null -eq $AteraAPI.nextLink) {
 			Write-Host "End of Devices."
 			Return
-		} else {
+		}
 	    Write-Host "Grabbing Next Page of Devices..."
-	    $script:thejson = $AteraAPI.nextLink
-	  	}
+	    $global:thejson = $AteraAPI.nextLink
 	}
 }
 #░█████╗░████████╗███████╗██████╗░░█████╗░
@@ -1285,7 +1298,7 @@ function Install-Atera
 		[Parameter(Mandatory = $true, Position = 0)]
 		[object]$ClientID
 	)
-	Get-AteraCheck $ClientID
+	#Get-AteraCheck $ClientID
 	Add-OutputBoxLine "Creating Temp folder in C:\Temp"
 	Get-TempFolder
 	Add-OutputBoxLine "Downloading Atera Installer..."
