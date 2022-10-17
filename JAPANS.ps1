@@ -1782,8 +1782,16 @@ $RenameButton.Size = New-Object System.Drawing.Size(175, 23)
 $RenameButton.Text = 'Rename this PC'
 $tab3.Controls.Add($RenameButton)
 $RenameButton.Add_Click({
-	Set-NewPCName
+	$newname = $Renamebox.text
+	$adminuser = Get-Credential
+	Rename-Computer -NewName $newname -DomainCredential $adminuser
 })
+
+#Rename Box
+$Renamebox = New-Object System.Windows.Forms.TextBox
+$RenameBox.Location = New-Object System.Drawing.Point(200, 126)
+$Renamebox.Size = New-Object System.Drawing.Size(175, 23)
+$tab3.Controls.Add($Renamebox)
 
 #
 # This whole part just hides the console window
