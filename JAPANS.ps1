@@ -105,7 +105,6 @@ $clientarray = @(
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
 function Get-Valley_Beverage {
-	Set-NewPCName
 	Install-Atera 58
 	Install-Webroot EA4A-ATRA-A9A6-8EDA-4FEF
 	Install-GChrome
@@ -134,7 +133,6 @@ function Get-Carey_Land_Surveys {
 	Resolve-ProgressBar
 }
 function Get-Kennebec_Eye_Care {
-	Set-NewPCName
 	Install-Atera 37
 	Install-Webroot 062A-ATRA-708E-C101-4284
 	Install-GChrome
@@ -193,7 +191,6 @@ function Get-Hawks_Nest_Lodge {
 }
 function Get-Granite_Corp
 {
-	Set-NewPCName
 	Install-Atera 3
 	Install-Webroot 5477-ATRA-AAEC-93E6-450E
 	Install-GChrome
@@ -208,7 +205,6 @@ function Get-Granite_Corp
 }
 function Get-Maine_Center_for_Dental_Medicine
 {
-    Set-NewPCName
 	Install-Atera 11
 	Install-Webroot A17D-ATRA-C256-BC28-4CA2
 	Install-GChrome
@@ -224,7 +220,6 @@ function Get-Maine_Center_for_Dental_Medicine
 }
 function Get-CB_Mattson
 {
-	Set-NewPCName
 	Install-Atera 38
 	Install-Webroot 5A76-ATRA-04A6-8F94-425E
 	Install-GChrome
@@ -255,7 +250,6 @@ function Get-United_Way_TVA
 }
 function Get-Mabel_Wadsworth
 {
-    Set-NewPCName
     Install-Atera 56
     Install-Webroot 0AF7-ATRA-16A5-FE4D-46F0
     Install-GChrome
@@ -302,7 +296,6 @@ function Get-Century_21_SRE
 }
 function Get-Campbells_True_Value
 {
-	Set-NewPCName
 	Install-Atera 5
 	Install-Webroot CDAB-ATRA-9D91-4CC3-4121
 	Install-Epicor Campbells
@@ -319,7 +312,6 @@ function Get-Campbells_True_Value
 }
 function Get-Golden_Pond_Wealth_Management
 {
-	Set-NewPCName
 	Install-Atera 31
 	Install-Webroot 6F59-ATRA-6284-A3BA-4625
 	Install-NetEx
@@ -335,7 +327,6 @@ function Get-Golden_Pond_Wealth_Management
 }
 function Get-Home_Hope_And_Healing
 {
-	Set-NewPCName
 	Install-Atera 6
 	Install-Webroot 0252-ATRA-5CEE-9DD5-4820
 	Install-NetEx
@@ -366,7 +357,6 @@ function Get-Northern_Outdoors
 }
 function Get-Ray_Haskell_Ford
 {
-	Set-NewPCName
 	Install-Atera 2
 	Install-Webroot 8DF6-ATRA-720C-25F4-4595
 	Install-GChrome
@@ -944,13 +934,20 @@ function Set-DNSAndDomain
 	}
 	[System.Windows.MessageBox]::Show('Be aware to open the tunnel and be on TSMLab before the next step')
 	Add-OutputBoxLine "Attempting to add to domain, please add credentials..."
-	Add-Computer -DomainName $DomainServer
+	$adminuser = Get-Credential
+	Add-Computer -Credential $adminuser -DomainName $DomainServer
 	Add-OutputBoxLine "Resetting DNS Server config..."
 	[System.Windows.MessageBox]::Show('Okay now close the tunnel.')
 	foreach ($element in $array)
 	{
 		Set-DnsClientServerAddress -InterfaceIndex $($element).InterfaceIndex -ResetServerAddresses
 	}
+	#Now Change PC name
+	[void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
+	$title = 'New PC Name'
+	$msg = 'Enter new PC Name:'
+	$text = [Microsoft.VisualBasic.Interaction]::InputBox($msg, $title)
+	Rename-Computer -NewName $text -DomainCredential $adminuser
 }
 #██████╗░██╗░░░░░░█████╗░░█████╗░████████╗░██╗░░░░░░░██╗░█████╗░██████╗░███████╗
 #██╔══██╗██║░░░░░██╔══██╗██╔══██╗╚══██╔══╝░██║░░██╗░░██║██╔══██╗██╔══██╗██╔════╝
