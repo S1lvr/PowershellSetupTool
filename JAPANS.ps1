@@ -336,6 +336,21 @@ function Get-Golden_Pond_Wealth_Management
 	Get-PowerSettingChanges
 	Set-TSMPassword -password "GPworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.16.252" -DomainServer "GoldenPondWealth.local"
+	import-module bitlocker
+	$BitLocker = Get-BitLockerVolume -MountPoint $env:SystemDrive 
+	$RecoveryProtector = $BitLocker.KeyProtector | Where-Object { $_.KeyProtectorType -eq 'RecoveryPassword' }
+	   
+	foreach ($Key in $RecoveryProtector.KeyProtectorID) {
+				try {
+					BackupToAAD-BitLockerKeyProtector -MountPoint $env:SystemDrive -KeyProtectorId $Key
+				}
+				catch {
+					Write-Output "Could not back up to Azure AD. Error: "
+					Write-Output $_
+				}
+	}
+	Get-BitLockerVolume | Enable-Bitlocker -MountPoint $env:SystemDrive -UsedSpaceOnly -SkipHardwareTest -TpmProtector
+	Add-OutputBoxLine "Bitlocker Enabled."
 	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
 }
