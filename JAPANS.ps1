@@ -82,6 +82,7 @@ $clientarray = @(
 	"Maine Coalition to End Domestic Violence"
 	"Carey Land Surveys"
 	"Valley Beverage"
+	"Maine Vocational Rehab Associates"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -104,6 +105,19 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Maine_Vocational_Rehab_Associates {
+	Install-Atera 78
+	Install-Webroot
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "MVRAworkstation!"
+	Set-DNSAndDomain -DNSServer "192.168.5.15" -DomainServer "MVRA.local"
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Valley_Beverage {
 	Install-Atera 58
 	Install-Webroot EA4A-ATRA-A9A6-8EDA-4FEF
@@ -114,7 +128,7 @@ function Get-Valley_Beverage {
 	Set-TSMPassword "VBworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.100.12" -DomainServer "valley.local"
 	Install-OfficeInstaller
-	Add-OutputBoxLine
+	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
 }
 function Get-Carey_Land_Surveys {
