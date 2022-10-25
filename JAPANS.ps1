@@ -675,11 +675,11 @@ function Invoke-Win10PinRemoval #this was already a powershell script. Ctrl + C 
 	#Disable pin requirement
 	$path = "HKLM:\SOFTWARE\Policies\Microsoft"
 	$key = "PassportForWork"
-	$name = "Enabled"
+	$TSMName = "Enabled"
 	$value = "0"
 	
 	New-Item -Path $path -Name $key -Force
-	New-ItemProperty -Path $path\$key -Name $name -Value $value -PropertyType DWORD -Force
+	New-ItemProperty -Path $path\$key -Name $TSMName -Value $value -PropertyType DWORD -Force
 	#Delete existing pins
 	$passportFolder = "C:\Windows\ServiceProfiles\LocalService\AppData\Local\Microsoft\Ngc"
 	if (Test-Path -Path $passportFolder)
@@ -770,9 +770,9 @@ function Set-TSMPassword
 	} else {
 		Add-OutputBoxLine "TSMAdmin account found,"
 	}
-	Add-OutputBoxLine "Setting TSMAdmin Password..."
-	$UserAccount = Get-LocalUser -Name "TSMAdmin"
-	$UserAccount | Set-LocalUser -Password $tsmpass
+	Add-OutputBoxLine "Setting TSMAdmin Password to $thepass..."
+	$TSMName = $TSMUser.name
+	Set-LocalUser -Name $TSMName -Password $tsmpass
 }
 <#function Get-TemperFolder {
     $Folder = "C:\Temp"
