@@ -1367,7 +1367,7 @@ function Install-Epicor
 		# If WB Install Epicor v31
 		Add-OutputBoxLine "Installing Epicor v31 for Ware Butler..."
 		Set-Location .\InstallData\WareButler
-		Start-Process "setup_31.exe" -wait -ArgumentList "/s"
+		Start-Process "setup_31.exe" -wait
 		Add-OutputBoxLine "Epicor v31 Installed."
 	}
 	elseif ($epicor -eq "Campbells")
@@ -1375,7 +1375,7 @@ function Install-Epicor
 		# If Campbells Install Epicor V30
 		Add-OutputBoxLine "Installing Epicor v30 for Campbells..."
 		Set-Location .\InstallData\Campbells
-		Start-Process "setup_30.exe" -wait -ArgumentList "/s"
+		Start-Process "setup_30.exe" -wait
 		Add-OutputBoxLine "Epicor v30 Installed."
 	}
 	else
