@@ -83,6 +83,7 @@ $clientarray = @(
 	"Carey Land Surveys"
 	"Valley Beverage"
 	"Maine Vocational Rehab Associates"
+	"Family Violence Project"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -93,7 +94,7 @@ $clientarray = @(
 #-----------
 #Todo: Finish Custom Client UI ( Domain Settings )
 #Todo: See if change in startup items script work. / It doesn't
-#Todo: Try installing PSWindowsUpdate and have it grab as many updates as it can at the start of the setup so the PC can be restarted at the end.
+#Todo: Install SplashtopSOS as if it were a program.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Run This Options:
@@ -105,6 +106,19 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Family_Violence_Project {
+	Install-Atera 101
+	Install-Webroot 32E3-ATRA-3229-C0FC-4970
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "FVPworkstation!"
+	Set-DNSAndDomain -DNSServer "192.168.25.92" -DomainServer "FVP.local"
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Maine_Vocational_Rehab_Associates {
 	Install-Atera 78
 	Install-Webroot 635F-ATRA-8D21-17F3-4143
@@ -772,7 +786,7 @@ function Set-TSMPassword
 	}
 	Add-OutputBoxLine "Setting TSMAdmin Password to $thepass..."
 	$TSMName = $TSMUser.name
-	Set-LocalUser -Name $TSMName -Password $tsmpass
+	Set-LocalUser -Name $TSMName -Password $tsmpass -PasswordNeverExpires 1
 }
 <#function Get-TemperFolder {
     $Folder = "C:\Temp"
