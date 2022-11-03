@@ -84,6 +84,7 @@ $clientarray = @(
 	"Valley Beverage"
 	"Maine Vocational Rehab Associates"
 	"Family Violence Project"
+	"Maine Forest Products Council"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -107,8 +108,8 @@ $clientarray = @(
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
 function Get-Maine_Forest_Products_Council {
-	Install-Atera
-	Install-Webroot
+	Install-Atera 76
+	Install-Webroot 7DD7-ATRA-BDCF-F188-4925
 	Install-GChrome
 	Set-ChromeDefault
 	Install-Reader
