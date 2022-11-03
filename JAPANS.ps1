@@ -106,6 +106,19 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+function Get-Maine_Forest_Products_Council {
+	Install-Atera
+	Install-Webroot
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "MFPCworkstation!"
+	Set-AzureADAccount
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Family_Violence_Project {
 	Install-Atera 101
 	Install-Webroot 32E3-ATRA-3229-C0FC-4970
