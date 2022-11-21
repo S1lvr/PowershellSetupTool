@@ -85,6 +85,7 @@ $clientarray = @(
 	"Maine Vocational Rehab Associates"
 	"Family Violence Project"
 	"Maine Forest Products Council"
+	"Sexual Assault Center"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -93,9 +94,18 @@ $clientarray = @(
 # Next Add commands to the function, for extra help, Ware Butler's function is
 # Completely Commented.
 #-----------
+#*Feature Additions/Changes:
+#---
 #Todo: Finish Custom Client UI ( Domain Settings )
-#Todo: See if change in startup items script work. / It doesn't
+#! or
+#Todo: Remove Custom Client Code since we never use it
+#---
+#Todo: See if change in startup items script work. # It doesn't
 #Todo: Install SplashtopSOS as if it were a program.
+#Todo: See about replacing included installers with pulling a new one every time to lower size of initial update/download
+#Todo: See about adding new scheduled task that runs on user login within the next day that does per-user settings.
+#Todo: REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot\Network\AteraAgent" /VE /T REG_SZ /F /D "Service"
+	# Do that ^ To add Atera as able to be ran in safe mode with networking.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Run This Options:
@@ -107,6 +117,29 @@ $clientarray = @(
 #Todo:	Rename PC / Done
 #Todo:	Add to AzureAD
 #Todo:  NetEx Installer
+#Client Changes:
+#*Ware Butler / Harris:
+#Todo: Use that screenshot I took to do a second run for the epicor installer.
+#*Hometown Heat Pumps:
+#Todo: Add Avast to Installed Programs
+#Todo: Add Firefox to Installed Programs
+#Todo: Add Trello to Installed Programs
+#Todo: Add Classic Shell to Installed Programs
+#* As Seperate Script for HHP:
+#Todo: Use https://stackoverflow.com/questions/31720595/pin-program-to-taskbar-using-ps-in-windows-10 or http://www.technosys.net/products/utils/pintotaskbar to auto-pin
+#Todo: Use https://stackoverflow.com/questions/68503485/how-to-sync-a-sharepoint-365-folder-using-a-bat-or-powershell to sync sharepoint
+function Get-Sexual_Assault_Center {
+	Install-Atera 61
+	Install-Webroot BB25-ATRA-FE8D-60CE-4F87
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "SACSCworkstation!"
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Maine_Forest_Products_Council {
 	Install-Atera 76
 	Install-Webroot 7DD7-ATRA-BDCF-F188-4925
