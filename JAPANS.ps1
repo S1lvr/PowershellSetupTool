@@ -128,6 +128,8 @@ $clientarray = @(
 #* As Seperate Script for HHP:
 #Todo: Use https://stackoverflow.com/questions/31720595/pin-program-to-taskbar-using-ps-in-windows-10 or http://www.technosys.net/products/utils/pintotaskbar to auto-pin
 #Todo: Use https://stackoverflow.com/questions/68503485/how-to-sync-a-sharepoint-365-folder-using-a-bat-or-powershell to sync sharepoint
+#*Ray Haskell Ford:
+#Todo: Install TightVNC Server
 function Get-Sexual_Assault_Center {
 	Install-Atera 61
 	Install-Webroot BB25-ATRA-FE8D-60CE-4F87
@@ -824,16 +826,16 @@ function Set-TSMPassword
 		[String]$thepass
 	)
 	$tsmpass = $thepass | ConvertTo-SecureString -AsPlainText -Force
-	$TSMUser = Get-LocalUser -Name "TSMAdmin"
-	if ($null -eq $TSMUser) {
+	#$TSMUser = Get-LocalUser -Name "TSMAdmin"
+<#	if ($null -eq $TSMUser) {
 		Add-OutputBoxLine "TSMAdmin account not found, creating..."
 		New-LocalUser -Name "TSMAdmin" -NoPassword
 	} else {
 		Add-OutputBoxLine "TSMAdmin account found,"
-	}
+	}#>
 	Add-OutputBoxLine "Setting TSMAdmin Password to $thepass..."
-	$TSMName = $TSMUser.name
-	Set-LocalUser -Name $TSMName -Password $tsmpass -PasswordNeverExpires 1
+	#$TSMName = $TSMUser.name
+	Set-LocalUser -Name "TSMAdmin" -Password $tsmpass -PasswordNeverExpires 1
 }
 <#function Get-TemperFolder {
     $Folder = "C:\Temp"
