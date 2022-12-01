@@ -138,6 +138,7 @@ function Get-Snow_Pond {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "SPworkstation!"
 	Set-DNSAndDomain -DNSServer "10.1.10.3" -DomainServer "ad.snowpond.org"
 	Install-OfficeInstaller
@@ -151,6 +152,7 @@ function Get-Sexual_Assault_Center {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "SACSCworkstation!"
 	Install-OfficeInstaller
 	Add-OutputBoxLine "Setup Completed."
@@ -163,6 +165,7 @@ function Get-Maine_Forest_Products_Council {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "MFPCworkstation!"
 	Set-AzureADAccount
 	Install-OfficeInstaller
@@ -176,6 +179,7 @@ function Get-Family_Violence_Project {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "FVPworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.25.92" -DomainServer "FVP.local"
 	Install-OfficeInstaller
@@ -189,6 +193,7 @@ function Get-Maine_Vocational_Rehab_Associates {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "MVRAworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.5.15" -DomainServer "MVRA.local"
 	Install-OfficeInstaller
@@ -202,6 +207,7 @@ function Get-Valley_Beverage {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "VBworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.100.12" -DomainServer "valley.local"
 	Install-OfficeInstaller
@@ -216,6 +222,7 @@ function Get-Carey_Land_Surveys {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "CLSworkstation!"
 	#Set-TSMPassword $TSMPass
 	#Set-AzureADAccount
@@ -230,6 +237,7 @@ function Get-Kennebec_Eye_Care {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "KECworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.0.5" -DomainServer "kennebeceye.local"
 	Install-OfficeMate
@@ -245,6 +253,7 @@ function Get-Hometown_Heat_Pumps {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "HHPworkstation!"
 	Set-AzureADAccount
 	Install-OfficeInstaller
@@ -260,6 +269,7 @@ function Get-Maine_Coalition_to_End_Domestic_Violence {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "MCEDVworkstation!"
 	Set-AzureADAccount
 	Install-OfficeInstaller
@@ -274,6 +284,7 @@ function Get-Hawks_Nest_Lodge {
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword "HNworkstation!"
 	Set-AzureADAccount
 	Install-OfficeInstaller
@@ -288,6 +299,7 @@ function Get-Granite_Corp
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "GCworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.16.3" -DomainServer "Granite-Corp.com"
 	Install-OfficeInstaller
@@ -302,6 +314,7 @@ function Get-Maine_Center_for_Dental_Medicine
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "MCDMworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.2.53" -DomainServer "MCDM.local"
 	Install-EagleSoft
@@ -318,6 +331,7 @@ function Get-CB_Mattson
 	Install-Reader
 	Install-NetEx
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "CBMworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.1.15" -DomainServer "CB-Mattson.loc"
 	Install-OfficeInstaller
@@ -333,6 +347,7 @@ function Get-United_Way_TVA
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "UWTVAworkstation!"
 	Set-AzureADAccount
 	Install-OfficeInstaller
@@ -348,6 +363,7 @@ function Get-Mabel_Wadsworth
     Install-Reader
     Install-OfficeInstaller
     Get-PowerSettingChanges
+	Install-Shared
     Set-TSMPassword -password "MWworkstation!"
     Set-DNSAndDomain -DNSServer "192.168.1.9" -DomainServer "mwadsworth.local"
 	Add-OutputBoxLine -Message "Setup Completed."
@@ -364,6 +380,7 @@ function Get-Rockland_Realty
 	Install-OfficeInstaller
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "RRworkstation!"
 	[System.Windows.MessageBox]::Show("Rockland Realty has a weird system, you can't add to their domain unless you on-site so. Good Luck.")
 	Add-OutputBoxLine -Message "Setup Completed."
@@ -380,6 +397,7 @@ function Get-Century_21_SRE
 	Install-OfficeInstaller
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "C21workstation!"
 	Set-AzureADAccount
 	Add-OutputBoxLine -Message "Setup Completed."
@@ -396,6 +414,7 @@ function Get-Campbells_True_Value
 	Install-OfficeInstaller
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "CTVworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.1.250" -DomainServer "Burger-Roy.local"
 	Add-OutputBoxLine "Setup Completed."
@@ -411,6 +430,7 @@ function Get-Golden_Pond_Wealth_Management
 	Install-OfficeInstaller
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "GPworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.16.252" -DomainServer "GoldenPondWealth.local"
 	import-module bitlocker
@@ -441,6 +461,7 @@ function Get-Home_Hope_And_Healing
 	Install-OfficeInstaller
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "HHHworkstation!"
 	Set-DNSAndDomain -DNSServer "192.168.1.6" -DomainServer "hhh.lan"
 	Add-OutputBoxLine "Setup Completed."
@@ -457,6 +478,7 @@ function Get-Northern_Outdoors
 	Install-OfficeInstaller
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "NOworkstation!"
 	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
@@ -471,6 +493,7 @@ function Get-Ray_Haskell_Ford
 	#Install-CDK
 	Install-OfficeInstaller
 	Get-PowerSettingChanges
+	Install-Shared
 	Set-TSMPassword -password "RHworkstation!"
 	Set-DNSAndDomain -DNSServer "10.5.190.202" -DomainServer "haskell.local"
 	Add-OutputBoxLine "Setup Complete."
@@ -488,6 +511,7 @@ function Get-Harris_Lumber
 	Set-ChromeDefault
 	Install-Reader
 	Get-PowerSettingChanges
+	Install-Shared
 	Install-OfficeInstaller
 	Set-TSMPassword -password "WBworkstation!"
 	Add-OutputBoxLine "Setup Completed."
@@ -505,6 +529,7 @@ function Get-Ware_Butler #Name of function, if you check the list near the botto
 	Install-OfficeInstaller #Install Office
 	Install-Reader #Install Reader
 	Get-PowerSettingChanges #This will open a batch file to set power settings
+	Install-Shared #I added this to just run things that should be ran on all PCs
 	Set-TSMPassword -password "WBworkstation!" #Set the password to match standard convention for TSMAdmin
 	Set-AzureADAccount #I just made this one, it just opens the settings window to add a computer to a domain.
 	Add-OutputBoxLine "Setup Completed." #Say it's done in the output box
@@ -722,6 +747,19 @@ function Get-Custom
 #██████╔╝███████╗░░░██║░░░╚██████╔╝██║░░░░░
 #╚═════╝░╚══════╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░
 # --------------------------------------------------------------------------------------------------
+function Install-Shared {
+	#- Splashtop SOS
+	Add-OutputBoxLine "Installing Splashtop SOS..."
+	New-Item "C:\Splashtop" -Type Directory 
+	Set-InstallStartupDirectory
+	copy-item -Path .\SplashtopSOS.exe -Destination "C:\Splashtop\SplashtopSOS.exe"
+		$SourceFilePath = "C:\Splashtop\SplashtopSOS.exe"
+		$ShortcutPath = "C:\Users\Public\Public Desktop\SplashtopSOS.lnk"
+		$WScriptObj = New-Object -ComObject ("WScript.Shell")
+		$shortcut = $WscriptObj.CreateShortcut($ShortcutPath)
+		$shortcut.TargetPath = $SourceFilePath
+	$shortcut.Save()
+}
 #Default Apps Settings
 function Set-DefaultMail { # Thank you Mr. Random Czech Microsoft Dev for making this easy.
     Set-InstallStartupDirectory

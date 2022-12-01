@@ -1,18 +1,16 @@
 $versioncheck = "https://raw.githubusercontent.com/S1lvr/PowershellSetupTool/main/InstallData/version.ini"
 $versionfile = ".\InstallData\version.ini"
-#Sets some variables
-Write-Host "Checking for new version..."
-Invoke-WebRequest -Uri $versioncheck -OutFile .\version.ini #Download the version.ini from github and compare with local.
-$newversionfile = ".\version.ini"
-Get-Content $versionfile | ForEach-Object {
-    $script:currentversion = $_.ToInt32($Null)
-    Write-Host "You are running v$script:currentversion"
+#Sets some variables, who we are and where we're going
+Write-Host "Checking for new version"
+Write-Host "If this hangs, ensure you're connected to the internet..."
+$newversionfile = Invoke-WebRequest -uri $versioncheck
+Get-Content $versionfile | ForEach-Object { #Pull the local version.ini and check the contents
+    $currentversion = $_.ToInt32($Null)
+    Write-Host "You are running v$currentversion"
 }
-Get-Content $newversionfile | ForEach-Object { #These two grab the number in the ini to know if the local or github is larger
-    $script:newversion = $_.ToInt32($Null)
-    Write-Host "Newest is v$script:newversion"
-}
-If ($script:currentversion -lt $script:newversion){
+$newversion = $newversionfile.content.ToInt32($null) #Convert the online one into an Int32
+Write-Host "Newest is v$newversion"
+If ($currentversion -lt $newversion){ #Compare!
     Write-Host "New version found, updating..."
     $download = "https://github.com/S1lvr/PowershellSetupTool/archive/refs/heads/main.zip"
     Invoke-WebRequest $download -outfile .\newversion.zip
@@ -31,7 +29,6 @@ If ($script:currentversion -lt $script:newversion){
     Write-Host "You are already running the newest version."
 }
 
-Remove-Item .\version.ini
 Write-Host "Running Script Now..."
 Start-Sleep 2
 start-process Powershell -ArgumentList "-f .\JAPANS.ps1"
