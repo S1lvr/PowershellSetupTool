@@ -86,6 +86,7 @@ $clientarray = @(
 	"Family Violence Project"
 	"Maine Forest Products Council"
 	"Sexual Assault Center"
+	"Snow Pond"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -130,6 +131,19 @@ $clientarray = @(
 #Todo: Use https://stackoverflow.com/questions/68503485/how-to-sync-a-sharepoint-365-folder-using-a-bat-or-powershell to sync sharepoint
 #*Ray Haskell Ford:
 #Todo: Install TightVNC Server
+function Get-Snow_Pond {
+	Install-Atera 92
+	Install-Webroot CFAC-ATRA-27D0-1B0C-42DA
+	Install-GChrome
+	Set-ChromeDefault
+	Install-Reader
+	Get-PowerSettingChanges
+	Set-TSMPassword "SPworkstation!"
+	Set-DNSAndDomain -DNSServer "10.1.10.3" -DomainServer "ad.snowpond.org"
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
+}
 function Get-Sexual_Assault_Center {
 	Install-Atera 61
 	Install-Webroot BB25-ATRA-FE8D-60CE-4F87
