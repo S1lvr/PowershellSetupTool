@@ -753,12 +753,12 @@ function Install-Shared {
 	New-Item "C:\Splashtop" -Type Directory 
 	Set-InstallStartupDirectory
 	copy-item -Path .\SplashtopSOS.exe -Destination "C:\Splashtop\SplashtopSOS.exe"
-		$SourceFilePath = "C:\Splashtop\SplashtopSOS.exe"
+	<#	$SourceFilePath = "C:\Splashtop\SplashtopSOS.exe"
 		$ShortcutPath = "C:\Users\Public\Public Desktop\SplashtopSOS.lnk"
 		$WScriptObj = New-Object -ComObject ("WScript.Shell")
 		$shortcut = $WscriptObj.CreateShortcut($ShortcutPath)
 		$shortcut.TargetPath = $SourceFilePath
-	$shortcut.Save()
+	$shortcut.Save()#>
 }
 #Default Apps Settings
 function Set-DefaultMail { # Thank you Mr. Random Czech Microsoft Dev for making this easy.
