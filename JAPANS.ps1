@@ -102,11 +102,11 @@ $clientarray = @(
 #Todo: Remove Custom Client Code since we never use it
 #---
 #Todo: See if change in startup items script work. # It doesn't
-#Todo: Install SplashtopSOS as if it were a program.
 #Todo: See about replacing included installers with pulling a new one every time to lower size of initial update/download
 #Todo: See about adding new scheduled task that runs on user login within the next day that does per-user settings.
 #Todo: REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot\Network\AteraAgent" /VE /T REG_SZ /F /D "Service"
 	# Do that ^ To add Atera as able to be ran in safe mode with networking.
+	# It didn't work that well, hold off.
 #*Config Changes:
 #Todo: Set up a "run just this command" option so I can do this easier.
 #Todo: Run This Options:
@@ -753,12 +753,12 @@ function Install-Shared {
 	New-Item "C:\Splashtop" -Type Directory 
 	Set-InstallStartupDirectory
 	copy-item -Path .\SplashtopSOS.exe -Destination "C:\Splashtop\SplashtopSOS.exe"
-	<#	$SourceFilePath = "C:\Splashtop\SplashtopSOS.exe"
-		$ShortcutPath = "C:\Users\Public\Public Desktop\SplashtopSOS.lnk"
+	 	$SourceFilePath = "C:\Splashtop\SplashtopSOS.exe"
+		$ShortcutPath = "C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\SplashtopSOS.lnk"
 		$WScriptObj = New-Object -ComObject ("WScript.Shell")
 		$shortcut = $WscriptObj.CreateShortcut($ShortcutPath)
 		$shortcut.TargetPath = $SourceFilePath
-	$shortcut.Save()#>
+	$shortcut.Save()
 }
 #Default Apps Settings
 function Set-DefaultMail { # Thank you Mr. Random Czech Microsoft Dev for making this easy.
@@ -1574,6 +1574,13 @@ function Install-GChrome
 	Set-InstallStartupDirectory
 	Start-Process SetDefaultBrowser -Wait -ArgumentList "chrome"
 }
+#███████╗██╗██████╗░███████╗███████╗░█████╗░██╗░░██╗
+#██╔════╝██║██╔══██╗██╔════╝██╔════╝██╔══██╗╚██╗██╔╝
+#█████╗░░██║██████╔╝█████╗░░█████╗░░██║░░██║░╚███╔╝░
+#██╔══╝░░██║██╔══██╗██╔══╝░░██╔══╝░░██║░░██║░██╔██╗░
+#██║░░░░░██║██║░░██║███████╗██║░░░░░╚█████╔╝██╔╝╚██╗
+#╚═╝░░░░░╚═╝╚═╝░░╚═╝╚══════╝╚═╝░░░░░░╚════╝░╚═╝░░╚═╝
+#Here's a download link https://download-installer.cdn.mozilla.net/pub/firefox/releases/107.0.1/win64/en-US/Firefox%20Setup%20107.0.1.msi
 #░█████╗░███████╗███████╗██╗░█████╗░███████╗
 #██╔══██╗██╔════╝██╔════╝██║██╔══██╗██╔════╝
 #██║░░██║█████╗░░█████╗░░██║██║░░╚═╝█████╗░░
