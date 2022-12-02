@@ -3,7 +3,7 @@ $versionfile = ".\InstallData\version.ini"
 #Sets some variables, who we are and where we're going
 Write-Host "Checking for new version"
 Write-Host "If this hangs, ensure you're connected to the internet..."
-$newversionfile = Invoke-WebRequest -uri $versioncheck
+$newversionfile = Invoke-WebRequest -uri $versioncheck -UseBasicParsing
 Get-Content $versionfile | ForEach-Object { #Pull the local version.ini and check the contents
     $currentversion = $_.ToInt32($Null)
     Write-Host "You are running v$currentversion"
