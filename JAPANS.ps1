@@ -1450,7 +1450,7 @@ function Install-Atera
 	Add-OutputBoxLine "Creating Temp folder in C:\Temp"
 	Get-TempFolder
 	Add-OutputBoxLine "Downloading Atera Installer..."
-	$webrequest = -join ("http://servicedesk.techsolutionsme.com/GetAgent/Msi/?customerId=", $ClientID, "&integratorLogin=jbard%40techsolutionsme.com")
+	$webrequest = -join ("https://tsmaine.servicedesk.atera.com/GetAgent/Msi/?customerId=", $ClientID, "&integratorLogin=jbard%40techsolutionsme.com")
 	#--------------------------------------
 	# This link uses my login, so if I ever leave someone needs to change this to someone else's login.
 	#--------------------------------------
