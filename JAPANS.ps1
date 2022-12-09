@@ -102,6 +102,37 @@ $clientarray = @(
 #Todo: Remove Custom Client Code since we never use it
 #---
 #Todo: See if change in startup items script work. # It doesn't
+<# Try this:
+# Stop Microsoft Teams from launching on startup
+$TeamsService = Get-Service -Name "Teams"
+$TeamsService.StartType = "Disabled"
+$TeamsService.Stop()
+
+# Stop Microsoft Edge from launching on startup
+$EdgeStartupTask = Get-ScheduledTask -TaskName "MicrosoftEdgeUpdateTaskMachineCore"
+$EdgeStartupTask.State = "Disabled"
+$EdgeStartupTask.Stop()
+#>
+#Todo: Fix Loading Bar
+<#
+function Get-FunctionLineCount
+{
+	param
+	(
+		[parameter(Mandatory = $true, Position = 0)]
+		[String]$FunctionName
+	)
+	# Get the function definition
+	$functionDefinition = Get-Content function:$FunctionName
+
+	# Split the function definition into lines
+	$lines = $functionDefinition -split "`n"
+
+	# Return the number of lines minus 2
+	return $lines.Count - 2
+}
+This function will return the number of lines in a function, telling us the number of steps in our setup process.
+#>
 #Todo: See about replacing included installers with pulling a new one every time to lower size of initial update/download
 #Todo: See about adding new scheduled task that runs on user login within the next day that does per-user settings.
 #Todo: REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot\Network\AteraAgent" /VE /T REG_SZ /F /D "Service"
@@ -513,7 +544,7 @@ function Get-Harris_Lumber
 	Get-PowerSettingChanges
 	Install-Shared
 	Install-OfficeInstaller
-	Set-TSMPassword -password "WBworkstation!"
+	Set-TSMPassword -password "HLworkstation!"
 	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
 }
@@ -1313,12 +1344,12 @@ function Install-CDK {
 		Set-StaticIP -ip $script:testip -gateway "10.5.190.127" # Set IP to pre-created IP, set gateway to the gateway at RHF
 		if (Test-NetConnection 1.1.1.1 -eq true) { #If the computer can still access the internet,
 			Add-OutputBoxLine "Test successful, IP address set and connectivity confirmed."
-			$script:iptest = $false #Mark this as false so we can stop the loop
+			$iptest = $false #Mark this as false so we can stop the loop
 		} else { #If it can't access the internet,
 			Add-OutputBoxLine "Test unsuccessful, IP Address set incorrectly, or computer has no internet otherwise."
-			$script:iptest = $true #Keep it true so we can try a new IP.
+			$iptest = $true #Keep it true so we can try a new IP.
 		}
-	} While ($script:iptest -eq $true)
+	} While ($iptest -eq $true)
 	$output = "PC has been static'd to " + $script:testip
 	Add-OutputBoxLine $output
 	Add-OutputBoxLine "Trying to install CDK, no idea if this works"
@@ -1341,7 +1372,7 @@ function Install-CDK {
 #░░░╚═╝░░░╚═╝░░╚══════╝╚═════╝░╚═╝░░╚═╝░╚════╝░░╚════╝░░░░╚═╝░░░
 #Update Info:
 #This install should not need to be updated, but if so, replace wsasme.msi
-function Install-Webroot
+<#function Install-Webroot
 {
 	Param
 	(
@@ -1357,7 +1388,42 @@ function Install-Webroot
 	
 	# echo msiexec /i wsasme.msi GUILIC=$key CMDLINE=SME,quiet /qn /l*v install.log
 	# echo Install Webroot with Key $key
+}#>
+function Install-Webroot
+{
+	# Define the function parameters
+	Param
+	(
+		# The Webroot license key
+		[Parameter(Mandatory = $true, Position = 0)]
+		[string]$key
+	)
+	
+	# Set the installation directory
+	Set-InstallStartupDirectory
+	
+	# Create the argument string for the msiexec program
+	$WRArguments = "/package wsasme.msi GUILIC=$key /qn"
+	
+	# Display a message indicating that the installation is starting
+	$outputwr1 = "Starting Webroot Install for client: $x..."
+	Add-OutputBoxLine $outputwr1
+	
+	# Launch the msiexec program and wait for it to complete
+	try
+	{
+		Start-Process msiexec -Wait -ArgumentList $WRArguments
+		
+		# Display a message indicating that the installation has completed
+		Add-OutputBoxLine "Webroot install completed."
+	}
+	catch
+	{
+		# Display an error message if the installation fails
+		Add-OutputBoxLine "Webroot installation failed. Error: $($_.Exception.Message)"
+	}
 }
+
 <# Here is the "atera check" system
 #░█████╗░████████╗███████╗██████╗░░█████╗░  ░█████╗░██╗░░██╗███████╗░█████╗░██╗░░██╗░░░
 #██╔══██╗╚══██╔══╝██╔════╝██╔══██╗██╔══██╗  ██╔══██╗██║░░██║██╔════╝██╔══██╗██║░██╔╝░░░
@@ -1439,7 +1505,7 @@ function Get-SerialStatus {
 #Update Info:
 #This literally pulls a fresh installer every time.
 #Updates not required.
-function Install-Atera
+<#function Install-Atera
 {
 	Param
 	(
@@ -1459,6 +1525,41 @@ function Install-Atera
 	Add-OutputBoxLine "Atera Downloaded (If you have internet,) now installing, please select Yes"
 	Start-Process msiexec -Wait -ArgumentList "/i Atera.msi"
 	Add-OutputBoxLine "Atera Installed"
+}#>
+function Install-Atera
+{
+	# Define the function parameters
+	Param
+	(
+		# The ID of the client for whom Atera is being installed
+		[Parameter(Mandatory = $true, Position = 0)]
+		[object]$ClientID
+	)
+	
+	# Create the temporary folder for the Atera installer
+	Add-OutputBoxLine "Creating Temp folder in C:\Temp"
+	Get-TempFolder
+	
+	# Download the Atera installer from the specified URL
+	Add-OutputBoxLine "Downloading Atera Installer..."
+	$ateraDownloadUrl = "https://tsmaine.servicedesk.atera.com/GetAgent/Msi/?customerId=$ClientID&integratorLogin=jbard%40techsolutionsme.com"
+	Invoke-WebRequest -Uri $ateraDownloadUrl -Outfile C:\Temp\Atera.msi
+	
+	# Change the current directory to the temporary folder
+	Set-Location C:\Temp
+	
+	# Install Atera using the downloaded installer
+	try
+	{
+		Add-OutputBoxLine "Atera Downloaded (If you have internet,) now installing, please select Yes"
+		Start-Process msiexec -Wait -ArgumentList "/i Atera.msi"
+		Add-OutputBoxLine "Atera Installed"
+	}
+	catch
+	{
+		# Display an error message if the installation fails
+		Add-OutputBoxLine "Atera installation failed. Error: $($_.Exception.Message)"
+	}
 }
 #███████╗██████╗░██╗░█████╗░░█████╗░██████╗░
 #██╔════╝██╔══██╗██║██╔══██╗██╔══██╗██╔══██╗
@@ -1469,7 +1570,7 @@ function Install-Atera
 #Update Info:
 #I did name these off their versions didn't I.
 #If you feel lazy just replace the correct setup executables.
-function Install-Epicor
+<#function Install-Epicor
 {
 	Param
 	(
@@ -1504,7 +1605,54 @@ function Install-Epicor
 		}
 		popUp "Epicor tried to install with unrecognised client" "Error"
 	}
+}#>
+function Install-Epicor
+{
+	# Define the function parameters
+	Param
+	(
+		# The client for whom Epicor is being installed
+		[Parameter(Mandatory = $true, Position = 0)]
+		[string]$epicor
+	)
+	
+	# Change the current directory to the installation folder
+	Set-Location $working
+	
+	# Check the value of the $epicor variable and install the appropriate version of Epicor
+	switch ($epicor)
+	{
+		"WB"
+		{
+			# If WB Install Epicor v31
+			Add-OutputBoxLine "Installing Epicor v31 for either Ware Butler or Harris Lumber..."
+			Set-Location .\InstallData\WareButler
+			Start-Process "setup_31.exe" -wait
+			Add-OutputBoxLine "Epicor v31 Installed."
+		}
+		"Campbells"
+		{
+			# If Campbells Install Epicor V30
+			Add-OutputBoxLine "Installing Epicor v30 for Campbells..."
+			Set-Location .\InstallData\Campbells
+			Start-Process "setup_30.exe" -wait
+			Add-OutputBoxLine "Epicor v30 Installed."
+		}
+		default
+		{
+			# If anything else, display an error message
+			Write-Error "Epicor tried to install with unrecognized client"
+		}
+	}
+	<#
+	if ($epicor -eq ("WB" -or "Campbells")) {
+		if (test-path("where the installer ends up on a fuckup")) {
+			run that installer
+		}
+	}
+	#>
 }
+
 #░█████╗░░█████╗░███╗░░░███╗██████╗░░█████╗░░██████╗░██████╗
 #██╔══██╗██╔══██╗████╗░████║██╔══██╗██╔══██╗██╔════╝██╔════╝
 #██║░░╚═╝██║░░██║██╔████╔██║██████╔╝███████║╚█████╗░╚█████╗░
