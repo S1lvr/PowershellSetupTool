@@ -45,10 +45,12 @@ if ($null -eq `
 		Install-Module -Name PSWindowsUpdate -Force
 		Write-Host "Starting Windows Update in Background..."
 		Start-Sleep 1
-		Start-Job -Name "WUpdate" -ScriptBlock {Get-WindowsUpdate -AcceptAll Install}
+		Get-WindowsUpdate -AcceptAll
+		Start-Job -Name "WUpdate" -ScriptBlock {Install-WindowsUpdate -AcceptAll}
 } else {
 	Write-Host "Starting Windows Update in Background..."
-	Start-Job -Name "WUpdate" -ScriptBlock {Get-WindowsUpdate -AcceptAll Install}
+	Get-WindowsUpdate -AcceptAll
+	Start-Job -Name "WUpdate" -ScriptBlock {Install-WindowsUpdate -AcceptAll}
 }
 # --------------------------------------------------------------------------------------------------
 #░█████╗░██╗░░░░░██╗███████╗███╗░░██╗████████╗░██████╗
@@ -372,7 +374,7 @@ function Get-CB_Mattson
 function Get-United_Way_TVA
 {
 	Set-NewPCName
-	Install-Atera 
+	Install-Atera 24
 	Install-Webroot B471-ATRA-B1A3-003E-4713
 	Install-GChrome
 	Set-ChromeDefault
@@ -1646,7 +1648,7 @@ function Install-Epicor
 	}
 	<#
 	if ($epicor -eq ("WB" -or "Campbells")) {
-		if (test-path("where the installer ends up on a fuckup")) {
+		if (test-path("where the installer ends up on a fuckup")) { # Here: C:\3apps\software\cursoft\eagleclient-31.0247.039\fsetup.exe
 			run that installer
 		}
 	}
