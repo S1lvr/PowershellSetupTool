@@ -89,6 +89,7 @@ $clientarray = @(
 	"Maine Forest Products Council"
 	"Sexual Assault Center"
 	"Snow Pond"
+	"Combined Benefits United"
 )
 # New Client Process:
 # Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
@@ -164,6 +165,16 @@ This function will return the number of lines in a function, telling us the numb
 #Todo: Use https://stackoverflow.com/questions/68503485/how-to-sync-a-sharepoint-365-folder-using-a-bat-or-powershell to sync sharepoint
 #*Ray Haskell Ford:
 #Todo: Install TightVNC Server
+function Get-Combined_Benefits_United {
+	Install-Atera 65
+	Install-Webroot 608E-ATRA-35EF-1799-4431
+	Install-GChrome
+	Install-Reader
+	Get-PowerSettingChanges
+	Install-Shared
+	Set-TSMPassword "CBUworkstation!"
+	Set-DNSAndDomain 
+}
 function Get-Snow_Pond {
 	Install-Atera 92
 	Install-Webroot CFAC-ATRA-27D0-1B0C-42DA
@@ -174,6 +185,9 @@ function Get-Snow_Pond {
 	Install-Shared
 	Set-TSMPassword "SPworkstation!"
 	Set-DNSAndDomain -DNSServer "10.1.10.3" -DomainServer "ad.snowpond.org"
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Set-AzureADAccount
 	Install-OfficeInstaller
 	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
@@ -1538,6 +1552,11 @@ function Install-Atera
 		[object]$ClientID
 	)
 	
+	if($null -eq $ClientID){
+		[System.Windows.MessageBox]::Show("Hey there's no ClientID in this Atera install which means I did an uh oh whoopsie. Tell me who I whoopsie'd on.")
+		break
+	}
+
 	# Create the temporary folder for the Atera installer
 	Add-OutputBoxLine "Creating Temp folder in C:\Temp"
 	Get-TempFolder
