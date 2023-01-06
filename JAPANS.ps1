@@ -92,9 +92,9 @@ $clientarray = @(
 	"Combined Benefits United"
 )
 # New Client Process:
-# Add Client name to the Array above, using underscores instead of spaces, this space is automatically sorted alphabetically, so don't worry about that.
+# Add Client name to the Array above, using spaces instead of underscores, this list is automatically sorted alphabetically, so don't worry about that.
 # Create a function with the name scheme Get-<CLIENTNAME> where <CLIENTNAME> is
-# What you placed in the array above.
+# What you placed in the array above, but with underscores instead of spaces.
 # Next Add commands to the function, for extra help, Ware Butler's function is
 # Completely Commented.
 #-----------
