@@ -166,6 +166,7 @@ This function will return the number of lines in a function, telling us the numb
 #*Ray Haskell Ford:
 #Todo: Install TightVNC Server
 function Get-Combined_Benefits_United {
+	Set-NewPCName
 	Install-Atera 65
 	Install-Webroot 608E-ATRA-35EF-1799-4431
 	Install-GChrome
@@ -173,7 +174,10 @@ function Get-Combined_Benefits_United {
 	Get-PowerSettingChanges
 	Install-Shared
 	Set-TSMPassword "CBUworkstation!"
-	Set-DNSAndDomain 
+	Set-AzureADAccount
+	Install-OfficeInstaller
+	Add-OutputBoxLine "Setup Completed."
+	Resolve-ProgressBar
 }
 function Get-Snow_Pond {
 	Install-Atera 92
@@ -187,12 +191,10 @@ function Get-Snow_Pond {
 	Set-DNSAndDomain -DNSServer "10.1.10.3" -DomainServer "ad.snowpond.org"
 	Install-OfficeInstaller
 	Add-OutputBoxLine "Setup Completed."
-	Set-AzureADAccount
-	Install-OfficeInstaller
-	Add-OutputBoxLine "Setup Completed."
 	Resolve-ProgressBar
 }
 function Get-Sexual_Assault_Center {
+	Set-NewPCName
 	Install-Atera 61
 	Install-Webroot BB25-ATRA-FE8D-60CE-4F87
 	Install-GChrome
@@ -206,6 +208,7 @@ function Get-Sexual_Assault_Center {
 	Resolve-ProgressBar
 }
 function Get-Maine_Forest_Products_Council {
+	Set-NewPCName
 	Install-Atera 76
 	Install-Webroot 7DD7-ATRA-BDCF-F188-4925
 	Install-GChrome

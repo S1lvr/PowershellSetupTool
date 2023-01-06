@@ -25,6 +25,8 @@ If ($currentversion -lt $newversion){ #Compare!
     Remove-Item -LiteralPath ".\PowershellSetupTool-main" -Force -Recurse
     Remove-Item -Path .\newversion.zip -force
     Write-Host "Cleaning Up..."
+    Set-Location .\InstallData
+    Invoke-WebRequest -uri $versioncheck -UseBasicParsing -OutFile .\version.ini
 } else {
     Write-Host "You are already running the newest version."
 }
