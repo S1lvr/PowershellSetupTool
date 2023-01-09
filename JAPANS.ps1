@@ -797,7 +797,26 @@ function Get-Custom
 #██████╔╝███████╗░░░██║░░░╚██████╔╝██║░░░░░
 #╚═════╝░╚══════╝░░░╚═╝░░░░╚═════╝░╚═╝░░░░░
 # --------------------------------------------------------------------------------------------------
+function Get-PopUp {
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory = $true,
+					Position = 0)]
+		[string]
+		$PMSG
+	)
+	[System.Windows.MessageBox]::Show($PMSG)
+}
 function Install-Shared {
+	#- Support Assist
+	$manf = Get-WMIObject -class Win32_ComputerSystem
+	if($manf.Manufacturer -like "Dell Inc."){ 
+		Add-OutputBoxLine "This PC is 100% a certified DELL."
+		Add-OutputBoxLine "Installing Support Assist for Drivers..."
+		Set-InstallStartupDirectory
+		Start-Process ".\SupportAssistInstaller.exe" -Wait
+		Get-PopUp "Ok so next you WILL need to launch Support Assist after this, and have it run 'Update.' to grab drivers."
+	}
 	#- Splashtop SOS
 	Add-OutputBoxLine "Installing Splashtop SOS..."
 	New-Item "C:\Splashtop" -Type Directory 
