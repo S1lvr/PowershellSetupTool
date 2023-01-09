@@ -810,7 +810,7 @@ function Get-PopUp {
 function Install-Shared {
 	#- Support Assist
 	$manf = Get-WMIObject -class Win32_ComputerSystem
-	if($manf.Manufacturer -like "Dell Inc."){ 
+	if($manf.Manufacturer -like "Dell*"){ 
 		Add-OutputBoxLine "This PC is 100% a certified DELL."
 		Add-OutputBoxLine "Installing Support Assist for Drivers..."
 		Set-InstallStartupDirectory
